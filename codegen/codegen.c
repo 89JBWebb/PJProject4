@@ -196,9 +196,11 @@ void emitWriteString(DList instList,  DList dataList, int writeType, char *str, 
 	else
 	  fmtStr = nssave(3, "\"%", lenStr, "s\\n\"");  
 	
+	inst = ssave("\tmovl $0, %eax");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
     fmtLabel = makeDataDeclaration(dataList, fmtStr);
 	free(fmtStr);
-	  
 	inst = nssave(3, "\tleaq ", fmtLabel, "(%rip), %rdi");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
     free(fmtLabel);
@@ -463,9 +465,10 @@ int emitComputeVariableAddress(DList instList, int varIndex) {
   char *inst; 
   inst = nssave(2,"\tleaq _gp(%rip), ", addrRegName);
   dlinkAppend(instList,dlinkNodeAlloc(inst));
-  inst = nssave(4,"\taddq $", offsetStr, ", ", addrRegName);
-  dlinkAppend(instList,dlinkNodeAlloc(inst));
-  
+  if(offset != 0){
+  	inst = nssave(4,"\taddq $", offsetStr, ", ", addrRegName);
+  	dlinkAppend(instList,dlinkNodeAlloc(inst));
+  }
   return addrRegIndex;
 }
 
@@ -705,6 +708,23 @@ void addIdToSymtab(DNode node, Generic gtypeid) {
  * Print out the procedure exit instructios
  *
  * @param instList a DList of instructions
+ * @param regIndex the register for which the return value is stored2
+ */
+void emitProcedureExitWithReturn(DList instList, int regIndex) {
+	char *inst = nssave(3, "\tmovl ", getIntegerRegisterName(regIndex), ", %eax");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	inst = ssave("\tmovq %rbp, %rsp");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	inst = ssave("\tpopq %rbp");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	inst = ssave("\tret");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+}
+
+/**
+ * Print out the procedure exit instructios
+ *
+ * @param instList a DList of instructions
  */
 void emitProcedureExit(DList instList) {
 	char *inst = ssave("\tleave");
@@ -719,7 +739,6 @@ void emitProcedureExit(DList instList) {
  */
 static void makeLabel(char label[20]) {
         static int labelCount = 0;
-
         snprintf(label,19,".L%d",labelCount++);
 }
 
@@ -752,6 +771,7 @@ int emitIfTest(DList instList, int regIndex) {
 
 	return SymIndex(globalSymtab,label);
 }
+
 /**
  * Insert a nop as a branch target in the list of instructions.
  *
@@ -850,11 +870,30 @@ void emitWhileLoopBackBranch(DList instList, int beginLabelIndex, int endLabelIn
  * @param function_name the name of the function we are calling
 */
 int emitCall(DList instList, char *function_name){
-	char *inst = nssave(2, "\t call ", function_name);
+
+	char *inst;
+
+	for(int i = 0; i < 10; i++){
+		if(isAllocatedIntegerRegister(i)){
+			inst = nssave(2, "\tpush ", get64bitIntegerRegisterName(i));
+			dlinkAppend(instList,dlinkNodeAlloc(inst));
+		}
+	}
+
+	inst = nssave(2, "\tcall ", function_name);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
+	for(int i = 0; i < 10; i++){
+		if(isAllocatedIntegerRegister(i)){
+			inst = nssave(2, "\tpop ", get64bitIntegerRegisterName(i));
+			dlinkAppend(instList,dlinkNodeAlloc(inst));
+		}
+	}
+
 	int treg = allocateIntegerRegister();
-	inst = nssave(2, "pop ", getIntegerRegisterName(treg));
-	
+	inst = nssave(2, "\tmovl %eax, ", getIntegerRegisterName(treg));
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
 	return treg;
+
 }

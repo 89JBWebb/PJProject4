@@ -2,6 +2,7 @@
 #define CODEGEN_H_
                          
 EXTERN(void, emitProcedurePrologue, (DList instList, char* name));
+EXTERN(void, emitProcedureExitWithReturn, (DList instList, int regIndex));
 EXTERN(void, emitProcedureExit, (DList instList));
 EXTERN(void, emitDataPrologue, (DList dataList));
 EXTERN(void, emitInstructions,(DList list));

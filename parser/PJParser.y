@@ -328,6 +328,7 @@ ExitStatement : T_EXIT T_LPAREN Expr T_RPAREN
 			//discard local data
 			//restore caller's FP
 			//jump to return address
+			emitProcedureExitWithReturn(instList, $3);
 		};
 
 CompoundStatement : T_BEGIN StatementList T_END

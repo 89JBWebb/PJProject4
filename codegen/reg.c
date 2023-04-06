@@ -14,10 +14,10 @@
 /**
  * The assembly language names of the X86-64 registers
  */
-static char* integerRegisterNames[] = {"%ebx","%ecx", 
+static char* integerRegisterNames[] = {"%ebx", "%ecx",
 				       "%r8d", "%r9d", "%r10d", "%r11d", "%r12d", "%r13d", "%r14d", "%r15d",
 				       "bogus"};
-static char* integer64bitRegisterNames[] = {"%rbx","%rcx",
+static char* integer64bitRegisterNames[] = {"%rbx", "%rcx",
 					    "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15",
 				       "bogus"};
 static bool *allocatedIntegerRegisters; /**< vector of bools indicated whether register is allocated or not */
