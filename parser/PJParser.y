@@ -138,9 +138,9 @@ ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 			$$ = "main";
 		};
 
-Decls : T_VAR DeclList{
-
-		};
+Decls : T_VAR DeclList 
+		|
+		;
 
 //todo add these on the stack
 //return tuples with identifiers and offsets
@@ -238,7 +238,7 @@ ProcedureHead : FunctionDecl Decls{
 
 FunctionDecl : T_FUNCTION T_IDENTIFIER T_COLON StandardType T_SEMICOLON{
 			//identifier to function
-			void emitProcedurePrologue(instList, $2);
+			emitProcedurePrologue(instList, $2);
 		};
 
 ProcedureBody : CompoundStatement T_SEMICOLON{
@@ -421,7 +421,7 @@ Factor          : Variable
 				//store return address
 				//store FP
 			//call function
-			emitCall(instList, $1);
+			$$ = emitCall(instList, $1);
 			//post call
 				//deallocatate basic AR
 				//restore caller-saved registers

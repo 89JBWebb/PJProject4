@@ -849,7 +849,12 @@ void emitWhileLoopBackBranch(DList instList, int beginLabelIndex, int endLabelIn
  * 
  * @param function_name the name of the function we are calling
 */
-void emitCall(DList instList, char *function_name){
+int emitCall(DList instList, char *function_name){
 	char *inst = nssave(2, "\t call ", function_name);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	int treg = allocateIntegerRegister();
+	inst = nssave(2, "pop ", getIntegerRegisterName(treg));
+	
+	return treg;
 }
