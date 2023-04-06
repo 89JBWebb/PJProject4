@@ -838,10 +838,18 @@ int emitWhileLoopTest(DList instList, int regIndex) {
  */
 void emitWhileLoopBackBranch(DList instList, int beginLabelIndex, int endLabelIndex) {
 	char *inst = nssave(2,"\tjmp ",(char*)SymGetFieldByIndex(globalSymtab,beginLabelIndex,SYM_NAME_FIELD));
-
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
 	inst = nssave(2,(char*)SymGetFieldByIndex(globalSymtab,endLabelIndex,SYM_NAME_FIELD),":\t nop");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+}
 
+/**
+ * Emit call thing
+ * 
+ * @param function_name the name of the function we are calling
+*/
+void emitCall(DList instList, char *function_name){
+	char *inst = nssave(2, "\t call ", function_name);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 }

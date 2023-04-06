@@ -112,7 +112,7 @@ extern FILE *yyin;
 
 %type <idList> IdentifierList
 %type <regIndex> Expr AddExpr MulExpr Factor Variable Constant
-%type <name> T_STRING T_INTNUM  ProgramHead T_IDENTIFIER OutputFormat
+%type <name> T_STRING T_INTNUM  ProgramHead T_IDENTIFIER OutputFormat FunctionDecl
 %type <typeId> Type StandardType ArrayType WriteToken
 %type <bounds> Dim
 %type <value> IntConst
@@ -138,10 +138,12 @@ ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 			$$ = "main";
 		};
 
-Decls : T_VAR DeclList
-		|
-	  	;
+Decls : T_VAR DeclList{
 
+		};
+
+//todo add these on the stack
+//return tuples with identifiers and offsets
 DeclList : IdentifierList T_COLON Type T_SEMICOLON
 		{
 			dlinkApply1($1,(DLinkApply1Func)addIdToSymtab, (Generic)$3);
@@ -218,17 +220,30 @@ Procedures : Procedures ProcedureDecl
 	   |
 	   ;
 
-ProcedureDecl : ProcedureHead ProcedureBody
-       ;
+ProcedureDecl : ProcedureHead ProcedureBody{
+			//postamble
+				//restore callee-saved regs
+				//discard local data
+				//restore call fp
+			//goto return address
+		};
 
-ProcedureHead : FunctionDecl Decls
-    	;
+ProcedureHead : FunctionDecl Decls{
+			//preamble
+				//extend AR for locals
+				//save callee-saved regs
+				//find static data area
+				//initialize locals
+    	};
 
-FunctionDecl : T_FUNCTION T_IDENTIFIER T_COLON StandardType T_SEMICOLON
-   	     ;
+FunctionDecl : T_FUNCTION T_IDENTIFIER T_COLON StandardType T_SEMICOLON{
+			//identifier to function
+			void emitProcedurePrologue(instList, $2);
+		};
 
-ProcedureBody : CompoundStatement T_SEMICOLON
-	      ;
+ProcedureBody : CompoundStatement T_SEMICOLON{
+			
+		};
 
 Statement : Assignment
 		| IfStatement
@@ -398,6 +413,21 @@ Factor          : Variable
 			$$ = emitNotExpression(instList,$2);
 		}
 		| T_IDENTIFIER T_LPAREN T_RPAREN
+		{
+			//pre call
+				//allocate AR
+				//save caller-saved regs
+				//evaluate and store params
+				//store return address
+				//store FP
+			//call function
+			emitCall(instList, $1);
+			//post call
+				//deallocatate basic AR
+				//restore caller-saved registers
+				//restore reference???
+				//parameters???
+		}
 		| T_LPAREN Expr T_RPAREN
 		{
 			$$ = $2;
@@ -408,17 +438,16 @@ Variable        : T_IDENTIFIER
 			int symIndex = SymQueryIndex(globalSymtab,$1);
 			$$ = emitComputeVariableAddress(instList, symIndex);
 		}
-                | T_IDENTIFIER T_LBRACKET Expr T_RBRACKET
-               	{
+        | T_IDENTIFIER T_LBRACKET Expr T_RBRACKET
+		{
 			int symIndex = SymQueryIndex(globalSymtab,$1);
-               		$$ = emitComputeArrayAddress(instList, symIndex,$3);
-               	}
+			$$ = emitComputeArrayAddress(instList, symIndex,$3);
+		}
 		| T_IDENTIFIER T_LBRACKET Expr T_COMMA Expr T_RBRACKET
-               	{
+		{
 			int symIndex = SymQueryIndex(globalSymtab,$1);
-               		$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);
-               	}
-                ;
+			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);
+		};
 
         		       
 Constant        : T_FLOATNUM    
