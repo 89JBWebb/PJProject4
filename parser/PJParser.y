@@ -14,7 +14,6 @@
 #include <util/dlink.h>
 #include <util/string_utils.h>
 #include <codegen/codegen.h>
-#include <codegen/codegen.h>
 #include <codegen/reg.h>
 #include <codegen/symfields.h>
 #include <codegen/types.h>
@@ -138,7 +137,9 @@ ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 			$$ = "main";
 		};
 
-Decls : T_VAR DeclList 
+Decls : T_VAR DeclList{
+			//raise the stack
+		}
 		|
 		;
 
@@ -234,11 +235,18 @@ ProcedureHead : FunctionDecl Decls{
 				//save callee-saved regs
 				//find static data area
 				//initialize locals
+			
+			//raise stack by an amount
+
+			//add variables to symbol table
+
     	};
 
 FunctionDecl : T_FUNCTION T_IDENTIFIER T_COLON StandardType T_SEMICOLON{
 			//identifier to function
 			emitProcedurePrologue(instList, $2);
+
+			$$ = $2
 		};
 
 ProcedureBody : CompoundStatement T_SEMICOLON{

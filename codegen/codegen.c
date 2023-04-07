@@ -10,6 +10,8 @@
 #include "symfields.h"
 
 extern SymTable globalSymtab;
+//functions should link to their parent
+//variables should link to their scope and offset
 extern int globalOffset;
 extern int dataSize;
 
@@ -719,6 +721,13 @@ void emitProcedureExitWithReturn(DList instList, int regIndex) {
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	inst = ssave("\tret");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	for(int i = 0; i < 10; i++){
+		if(isAllocatedIntegerRegister(i)){
+			freeIntegerRegister(i);
+		}
+	}
+
 }
 
 /**
@@ -883,7 +892,7 @@ int emitCall(DList instList, char *function_name){
 	inst = nssave(2, "\tcall ", function_name);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	for(int i = 0; i < 10; i++){
+	for(int i = 9; i >= 0; i--){
 		if(isAllocatedIntegerRegister(i)){
 			inst = nssave(2, "\tpop ", get64bitIntegerRegisterName(i));
 			dlinkAppend(instList,dlinkNodeAlloc(inst));

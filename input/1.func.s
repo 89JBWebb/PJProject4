@@ -23,18 +23,16 @@ t:	nop
 main:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	leaq _gp(%rip), %rcx
+	leaq _gp(%rip), %rbx
 	push %rbx
-	push %rcx
 	call t
 	pop %rbx
-	pop %rcx
-	movl %eax, %r8d
-	movl %r8d, (%rcx)
-	leaq _gp(%rip), %rcx
-	movl (%rcx), %r8d
+	movl %eax, %ecx
+	movl %ecx, (%rbx)
+	leaq _gp(%rip), %rbx
+	movl (%rbx), %ecx
 	leaq .string_const2(%rip), %rdi
-	movl %r8d, %esi
+	movl %ecx, %esi
 	movl $0, %eax
 	call printf@PLT
 	leave

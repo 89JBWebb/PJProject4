@@ -87,6 +87,7 @@ EXTERN(void,yyerror,(char*));
 EXTERN(int,yylex,(void));
 
 SymTable globalSymtab;
+SymTable localSymtab;
 
 static DList instList;
 static DList dataList;
