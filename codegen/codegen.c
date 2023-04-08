@@ -3,6 +3,7 @@
 #include <string.h>
 #include <util/string_utils.h>
 #include <util/symtab.h>
+#include <util/symtab_stack.h>
 #include <util/dlink.h>
 #include "reg.h"
 #include "codegen.h"
@@ -10,9 +11,11 @@
 #include "symfields.h"
 
 extern SymTable globalSymtab;
+extern SymtabStack localSymStack;
 //functions should link to their parent
 //variables should link to their scope and offset
 extern int globalOffset;
+extern int localOffset;
 extern int dataSize;
 
 static void printDataDeclaration(DNode decl);
@@ -45,11 +48,18 @@ void emitProcedurePrologue(DList instList, char* name) {
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	inst = nssave(2,name,":\tnop");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
-
 	inst = ssave("\tpushq %rbp");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	inst = ssave("\tmovq %rsp, %rbp");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
+}
+
+void raiseStack(DList instList){
+	char offsetStr[10];
+	int offset = (int) SymGetField( currentSymtab( localSymStack ), " ", "offset" );
+	snprintf(offsetStr,9,"%d",offset);
+	char *inst = nssave(3,"\tsubq $", offsetStr, ", %rsp");
+  	dlinkAppend(instList,dlinkNodeAlloc(inst));
 }
 
 
@@ -448,6 +458,7 @@ int emitDivideExpression(DList instList, int leftOperand, int rightOperand) {
 		return leftOperand;
 }
 
+
 /**
  * Add an instruction to compute the address of a variable.
  *
@@ -472,6 +483,53 @@ int emitComputeVariableAddress(DList instList, int varIndex) {
   	dlinkAppend(instList,dlinkNodeAlloc(inst));
   }
   return addrRegIndex;
+}
+
+/**
+ * Add an instruction to compute the address of a variable.
+ *
+ * @param instList a Dlist of instructions
+ * @param varIndex the register index for a variable
+ * @return the register index of the address register
+ */
+int emitComputeLocalAddress(DList instList, char *name) {
+	
+	int addrRegIndex = allocateIntegerRegister();   
+	char* addrRegName = (char*)get64bitIntegerRegisterName(addrRegIndex);
+
+	int backtraces = 0;
+	int offset = 0;
+	DNode node = dlinkHead(localSymStack);
+	int index = 0;
+
+	while (node != NULL) {
+		if (SymQueryIndex((SymTable)dlinkNodeAtom(node),name) != SYM_INVALID_INDEX){
+			break;
+		}
+		backtraces++;
+		node = dlinkNext(node);
+	}
+
+	offset = (int)SymGetField((SymTable)dlinkNodeAtom(node), name, "offset");
+
+	char offsetStr[10];
+	snprintf(offsetStr,9,"%d",offset);
+
+	char *inst;
+
+	inst = nssave(2,"\tmovq %rbp, ", addrRegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	for(int i = 0; i < backtraces; i++){
+		inst = nssave(4,"\tmovq (", addrRegName, "), ", addrRegName);
+		dlinkAppend(instList,dlinkNodeAlloc(inst));	
+	}
+
+	if(offset != 0){
+		inst = nssave(4,"\tsubq $", offsetStr, ", ", addrRegName);
+		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+	return addrRegIndex;
 }
 
 /**
@@ -557,6 +615,57 @@ int emitCompute2DArrayAddress(DList instList, int varIndex, int subIndex1, int s
 	freeIntegerRegister(subIndex2);
 	return regIndex;
 
+}
+
+/**
+ * Compute the address of an array element and store it in a register.
+ *
+ * @param instList a list of instructions
+ * @param varIndex the symbol table index of the array variable
+ * @param subIndex1 index of the register holding the 1st subscript value
+ * @param subIndex2 index of the register holding the 2nd subscript value
+ * @return the symbol table index of the register holding the address of the
+ * 		   array element.
+ */
+int emitComputeLocalArrayAddress(DList instList, char *name) {
+	
+	int addrRegIndex = allocateIntegerRegister();   
+	char* addrRegName = (char*)get64bitIntegerRegisterName(addrRegIndex);
+
+	int backtraces = 0;
+	int offset = 0;
+	DNode node = dlinkHead(localSymStack);
+	int index = 0;
+
+	while (node != NULL) {
+		if (SymQueryIndex((SymTable)dlinkNodeAtom(node),name) != SYM_INVALID_INDEX){
+			break;
+		}
+		backtraces++;
+		node = dlinkNext(node);
+	}
+
+	index = SymQueryIndex((SymTable)dlinkNodeAtom(node), name);
+	offset = (int)SymGetFieldByIndex((SymTable)dlinkNodeAtom(node), index, SYMTAB_OFFSET_FIELD);
+
+	char offsetStr[10];
+	snprintf(offsetStr,9,"%d",offset);
+
+	char *inst;
+
+	inst = nssave(2,"\tmovq %rbp, ", addrRegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	for(int i = 0; i < backtraces; i++){
+		inst = nssave(4,"movq (", addrRegName, "), ", addrRegName);
+		dlinkAppend(instList,dlinkNodeAlloc(inst));	
+	}
+
+	if(offset != 0){
+		inst = nssave(4,"\tsubq $", offsetStr, ", ", addrRegName);
+		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+	return addrRegIndex;
 }
 
 /**
@@ -704,6 +813,29 @@ void addIdToSymtab(DNode node, Generic gtypeid) {
         SymPutFieldByIndex(globalSymtab, symIndex, SYMTAB_TYPE_INDEX_FIELD, (Generic)typeid);
 
 	globalOffset += typeSize;
+}
+
+/**
+ * Add an identifier to the symbol table and store its offset in the activation record.
+ * This function is called by dlinkApply1.
+ *
+ * @param node a node on a linked list containing the symbol table index of a variable
+ *                delcared in a program
+ * @param gtypeid typeid of the variable 
+ */
+void addIdToSymStack(DNode node, Generic gtypeid) {
+	char *id = (char *)dlinkNodeAtom(node);
+	int offset;
+	int typeid = (int)gtypeid;
+	int typeSize = getTypeSize(typeid);
+
+	offset = (int) SymGetField( currentSymtab(localSymStack), " ", "offset");
+	offset+= typeSize;
+	SymPutField( currentSymtab(localSymStack), " ", "offset", (Generic) offset);
+
+	SymPutField( currentSymtab(localSymStack), id, "offset", (Generic)(offset));
+    SymPutField( currentSymtab(localSymStack), id, "type", (Generic)typeid);
+	
 }
 
 /**

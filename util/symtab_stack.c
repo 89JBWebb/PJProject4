@@ -35,6 +35,11 @@ int stackSize(SymtabStack stack) {
  */
 SymTable beginScope(SymtabStack stack) {
 	SymTable symtab = SymInit(SYMTABLE_SIZE);
+	
+	SymInitField(symtab, "offset", (Generic)-1, NULL);
+	SymInitField(symtab, "type", (Generic)-1, NULL);
+	SymPutField(symtab, " " , "offset", (Generic)0);
+
 	dlinkPush(dlinkNodeAlloc((Generic)symtab),stack);
 	int *size = (int*)dlinkListAtom(stack);
 	(*size)++;

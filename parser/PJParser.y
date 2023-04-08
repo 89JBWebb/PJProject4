@@ -11,6 +11,7 @@
 #include <strings.h>
 #include <util/general.h>
 #include <util/symtab.h>
+#include <util/symtab_stack.h>
 #include <util/dlink.h>
 #include <util/string_utils.h>
 #include <codegen/codegen.h>
@@ -27,12 +28,14 @@ EXTERN(void,yyerror,(char*));
 EXTERN(int,yylex,(void));
 
 SymTable globalSymtab;
+SymtabStack localSymStack;
 
 static DList instList;
 static DList dataList;
 char *fileName;
 
 int globalOffset = 0;
+int localOffset = 8;
 extern int yylineno;
 extern char *yytext;
 extern FILE *yyin;
@@ -130,6 +133,7 @@ Program : ProgramHeadAndProcedures CompoundStatement T_DOT
 ProgramHeadAndProcedures : ProgramHead Procedures
 		{
 			emitProcedurePrologue(instList,$1);
+			raiseStack(instList);
 		};
 
 ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
@@ -137,35 +141,41 @@ ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 			$$ = "main";
 		};
 
-Decls : T_VAR DeclList{
-			//raise the stack
-		}
+Decls : T_VAR DeclList
 		|
 		;
 
-//todo add these on the stack
-//return tuples with identifiers and offsets
 DeclList : IdentifierList T_COLON Type T_SEMICOLON
 		{
-			dlinkApply1($1,(DLinkApply1Func)addIdToSymtab, (Generic)$3);
+
+			//begin scope
+			beginScope(localSymStack);
+
+			//add symbols to the current scope
+			dlinkApply1($1,(DLinkApply1Func)addIdToSymStack, (Generic)$3);
 			dlinkFreeNodes($1);
+
+			//reuse if global is still a thing
+			//dlinkApply1($1,(DLinkApply1Func)addIdToSymtab, (Generic)$3);
+			//dlinkFreeNodes($1);
 		}
 		 | DeclList IdentifierList T_COLON Type T_SEMICOLON
 		{
-			dlinkApply1($2,(DLinkApply1Func)addIdToSymtab, (Generic)$4);
-			dlinkFreeNodes($2);
+
+			//add symbols to the current scope
+			dlinkApply1($2,(DLinkApply1Func)addIdToSymStack, (Generic)$4);
+			dlinkFreeNodes($2);			
+
 		};
 
 IdentifierList : T_IDENTIFIER
 		{
-			int symTabIndex = SymIndex(globalSymtab,$1);
 			$$ = dlinkListAlloc(NULL);
-			dlinkAppend($$,dlinkNodeAlloc((Generic)symTabIndex));
+			dlinkAppend($$,dlinkNodeAlloc((Generic)$1));
 		}
 	       | IdentifierList T_COMMA T_IDENTIFIER
 		{
-			int symTabIndex = SymIndex(globalSymtab,$3);
-			dlinkAppend($1,dlinkNodeAlloc((Generic)symTabIndex));
+			dlinkAppend($1,dlinkNodeAlloc((Generic)$3));
 			$$ = $1;
 		}
 
@@ -227,6 +237,9 @@ ProcedureDecl : ProcedureHead ProcedureBody{
 				//discard local data
 				//restore call fp
 			//goto return address
+
+			//remove symtab from stack
+			endScope(localSymStack);
 		};
 
 ProcedureHead : FunctionDecl Decls{
@@ -237,6 +250,7 @@ ProcedureHead : FunctionDecl Decls{
 				//initialize locals
 			
 			//raise stack by an amount
+			raiseStack(instList);
 
 			//add variables to symbol table
 
@@ -246,7 +260,7 @@ FunctionDecl : T_FUNCTION T_IDENTIFIER T_COLON StandardType T_SEMICOLON{
 			//identifier to function
 			emitProcedurePrologue(instList, $2);
 
-			$$ = $2
+			$$ = $2;
 		};
 
 ProcedureBody : CompoundStatement T_SEMICOLON{
@@ -444,18 +458,26 @@ Factor          : Variable
 
 Variable        : T_IDENTIFIER
 		{
-			int symIndex = SymQueryIndex(globalSymtab,$1);
-			$$ = emitComputeVariableAddress(instList, symIndex);
+			/*int symIndex = SymQueryIndex(globalSymtab,$1);
+			$$ = emitComputeVariableAddress(instList, symIndex);*/
+			char *name = $1;
+			$$ = emitComputeLocalAddress(instList, $1);
 		}
         | T_IDENTIFIER T_LBRACKET Expr T_RBRACKET
 		{
-			int symIndex = SymQueryIndex(globalSymtab,$1);
-			$$ = emitComputeArrayAddress(instList, symIndex,$3);
+			/*int symIndex = SymQueryIndex(globalSymtab,$1);
+			$$ = emitComputeArrayAddress(instList, symIndex,$3);*/
+
+			//$$ = emitComputeLocalArrayAddress(instList, $1, $3);
+
 		}
 		| T_IDENTIFIER T_LBRACKET Expr T_COMMA Expr T_RBRACKET
 		{
-			int symIndex = SymQueryIndex(globalSymtab,$1);
-			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);
+			/*int symIndex = SymQueryIndex(globalSymtab,$1);
+			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);*/
+
+			//$$ = emitComputeLocalMatrixAddress(instList, $1, $3);
+
 		};
 
         		       
@@ -511,6 +533,7 @@ static void initialize(char* inputFileName) {
 
 	
 	globalSymtab = SymInit(SYMTABLE_SIZE);
+	localSymStack = symtabStackInit();
 	SymInitField(globalSymtab,SYMTAB_OFFSET_FIELD,(Generic)-1,NULL);
 	initRegisters();
 	

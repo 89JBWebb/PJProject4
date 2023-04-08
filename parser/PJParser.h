@@ -102,7 +102,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 102 "PJParser.y" /* yacc.c:1909  */
+#line 104 "PJParser.y" /* yacc.c:1909  */
 
 	int   regIndex;
 	int	typeId;

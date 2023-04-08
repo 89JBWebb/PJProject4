@@ -2,6 +2,7 @@
 #define CODEGEN_H_
                          
 EXTERN(void, emitProcedurePrologue, (DList instList, char* name));
+EXTERN(void, raiseStack, (DList instList));
 EXTERN(void, emitProcedureExitWithReturn, (DList instList, int regIndex));
 EXTERN(void, emitProcedureExit, (DList instList));
 EXTERN(void, emitDataPrologue, (DList dataList));
@@ -30,9 +31,11 @@ EXTERN(void, emitEndBranchTarget, (DList instList, int endLabelIndex));
 EXTERN(int, emitThenBranch, (DList instList, int elseLabelIndex));
 EXTERN(int, emitWhileLoopLandingPad, (DList instList));
 EXTERN(int, emitWhileLoopTest, (DList instList, int regIndex));
+EXTERN(int, emitCall, (DList instList, char *function_name));
 EXTERN(void, emitWhileLoopBackBranch,(DList instList, int beginLabelIndex, int endLabelIndex));
 
 EXTERN(int, emitComputeVariableAddress,(DList instList, int varIndex));
+EXTERN(int, emitComputeLocalAddress,(DList instList, char *name));
 EXTERN(int, emitComputeArrayAddress, (DList instList, int varIndex, int subIndex));
 EXTERN(int, emitCompute2DArrayAddress, (DList instList, int varIndex, int subIndex1, int subIndex2));
 
@@ -40,6 +43,7 @@ EXTERN(int, emitLoadVariable,(DList instList, int varIndex));
 EXTERN(int, emitLoadIntegerConstant,(DList instList, char* intConst));
 
 EXTERN(void, addIdToSymtab, (DNode node, Generic gtypeid));
+EXTERN(void, addIdToSymStack, (DNode node, Generic gtypeid));
 
 EXTERN(void,yyerror,(char*));
 
