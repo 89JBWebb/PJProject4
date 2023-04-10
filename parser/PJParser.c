@@ -528,7 +528,7 @@ static const yytype_uint16 yyrline[] =
      312,   318,   322,   326,   332,   336,   341,   343,   347,   356,
      359,   360,   363,   367,   371,   375,   379,   383,   387,   393,
      397,   401,   405,   411,   413,   417,   421,   426,   430,   434,
-     438,   454,   459,   466,   474,   484,   485,   490,   494,   498
+     438,   454,   459,   466,   472,   482,   483,   488,   492,   496
 };
 #endif
 
@@ -1931,17 +1931,15 @@ yyreduce:
   case 73:
 #line 467 "PJParser.y" /* yacc.c:1646  */
     {
-			/*int symIndex = SymQueryIndex(globalSymtab,$1);
-			$$ = emitComputeArrayAddress(instList, symIndex,$3);*/
-
-			//$$ = emitComputeLocalArrayAddress(instList, $1, $3);
+	
+			(yyval.regIndex) = emitComputeArrayAddress(instList, (yyvsp[-3].name), (yyvsp[-1].regIndex));
 
 		}
-#line 1941 "PJParser.c" /* yacc.c:1646  */
+#line 1939 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 475 "PJParser.y" /* yacc.c:1646  */
+#line 473 "PJParser.y" /* yacc.c:1646  */
     {
 			/*int symIndex = SymQueryIndex(globalSymtab,$1);
 			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);*/
@@ -1949,44 +1947,44 @@ yyreduce:
 			//$$ = emitComputeLocalMatrixAddress(instList, $1, $3);
 
 		}
-#line 1953 "PJParser.c" /* yacc.c:1646  */
+#line 1951 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 486 "PJParser.y" /* yacc.c:1646  */
+#line 484 "PJParser.y" /* yacc.c:1646  */
     {   
 			char *negstr = nssave(2, "-", (yyvsp[0].name));
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,negstr); 
 		}
-#line 1962 "PJParser.c" /* yacc.c:1646  */
+#line 1960 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 491 "PJParser.y" /* yacc.c:1646  */
+#line 489 "PJParser.y" /* yacc.c:1646  */
     { 
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,(yyvsp[0].name)); 
 		}
-#line 1970 "PJParser.c" /* yacc.c:1646  */
+#line 1968 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 495 "PJParser.y" /* yacc.c:1646  */
+#line 493 "PJParser.y" /* yacc.c:1646  */
     { 
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,"1"); 
 		}
-#line 1978 "PJParser.c" /* yacc.c:1646  */
+#line 1976 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 499 "PJParser.y" /* yacc.c:1646  */
+#line 497 "PJParser.y" /* yacc.c:1646  */
     { 
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,"0"); 
 		}
-#line 1986 "PJParser.c" /* yacc.c:1646  */
+#line 1984 "PJParser.c" /* yacc.c:1646  */
     break;
 
 
-#line 1990 "PJParser.c" /* yacc.c:1646  */
+#line 1988 "PJParser.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2214,7 +2212,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 504 "PJParser.y" /* yacc.c:1906  */
+#line 502 "PJParser.y" /* yacc.c:1906  */
 
 
 

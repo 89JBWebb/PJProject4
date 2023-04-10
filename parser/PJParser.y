@@ -465,10 +465,8 @@ Variable        : T_IDENTIFIER
 		}
         | T_IDENTIFIER T_LBRACKET Expr T_RBRACKET
 		{
-			/*int symIndex = SymQueryIndex(globalSymtab,$1);
-			$$ = emitComputeArrayAddress(instList, symIndex,$3);*/
-
-			//$$ = emitComputeLocalArrayAddress(instList, $1, $3);
+	
+			$$ = emitComputeArrayAddress(instList, $1, $3);
 
 		}
 		| T_IDENTIFIER T_LBRACKET Expr T_COMMA Expr T_RBRACKET

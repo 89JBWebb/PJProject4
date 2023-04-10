@@ -622,107 +622,36 @@ int emitCompute2DArrayAddress(DList instList, int varIndex, int subIndex1, int s
  *
  * @param instList a list of instructions
  * @param varIndex the symbol table index of the array variable
- * @param subIndex1 index of the register holding the 1st subscript value
- * @param subIndex2 index of the register holding the 2nd subscript value
- * @return the symbol table index of the register holding the address of the
- * 		   array element.
- */
-int emitComputeLocalArrayAddress(DList instList, char *name) {
-	
-	int addrRegIndex = allocateIntegerRegister();   
-	char* addrRegName = (char*)get64bitIntegerRegisterName(addrRegIndex);
-
-	int backtraces = 0;
-	int offset = 0;
-	DNode node = dlinkHead(localSymStack);
-	int index = 0;
-
-	while (node != NULL) {
-		if (SymQueryIndex((SymTable)dlinkNodeAtom(node),name) != SYM_INVALID_INDEX){
-			break;
-		}
-		backtraces++;
-		node = dlinkNext(node);
-	}
-
-	index = SymQueryIndex((SymTable)dlinkNodeAtom(node), name);
-	offset = (int)SymGetFieldByIndex((SymTable)dlinkNodeAtom(node), index, SYMTAB_OFFSET_FIELD);
-
-	char offsetStr[10];
-	snprintf(offsetStr,9,"%d",offset);
-
-	char *inst;
-
-	inst = nssave(2,"\tmovq %rbp, ", addrRegName);
-	dlinkAppend(instList,dlinkNodeAlloc(inst));
-
-	for(int i = 0; i < backtraces; i++){
-		inst = nssave(4,"movq (", addrRegName, "), ", addrRegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));	
-	}
-
-	if(offset != 0){
-		inst = nssave(4,"\tsubq $", offsetStr, ", ", addrRegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-	}
-	return addrRegIndex;
-}
-
-/**
- * Compute the address of an array element and store it in a register.
- *
- * @param instList a list of instructions
- * @param varIndex the symbol table index of the array variable
  * @param subIndex index of the register holding the subscript value
  * @return the symbol table index of the register holding the address of the
  * 		   array element.
  */
-int emitComputeArrayAddress(DList instList, int varIndex, int subIndex) {
+int emitComputeArrayAddress(DList instList, char *name, int subIndex) {
 	int regIndex = allocateIntegerRegister();
-	int varTypeIndex = (int)SymGetFieldByIndex(globalSymtab,varIndex,SYMTAB_TYPE_INDEX_FIELD);
-	
-	  if (isArrayType(varTypeIndex)) {
-		char* regName = get64bitIntegerRegisterName(regIndex);
-		int offset = (int)SymGetFieldByIndex(globalSymtab,varIndex,SYMTAB_OFFSET_FIELD);
-		char offsetStr[10];
-		snprintf(offsetStr,9,"%d",offset);
-	
-		char *inst = nssave(2,"\tleaq _gp(%rip), ", regName);
-        
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-		inst = nssave(4,"\taddq $", offsetStr, ", ", regName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	int offset = (int)SymGetField(globalSymtab,name,"offset");
+	int type = (int)SymGetField(globalSymtab,name,"type");
+	int reg = emitComputeLocalAddress(instList, name);
 
-		/* compute offset based on subscript */
-	    char* subReg32Name = getIntegerRegisterName(subIndex);
-		char* subRegName = get64bitIntegerRegisterName(subIndex);
-		
-		inst = nssave(4,"\tmovslq ", subReg32Name, ", ", subRegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	/* compute offset based on subscript */
+	char* subReg32Name = getIntegerRegisterName(subIndex);
+	char* subRegName = get64bitIntegerRegisterName(subIndex);
 
-		// to do: use element size below
-		snprintf(offsetStr,9,"%d",get1stDimensionbase(varTypeIndex));
-		inst = nssave(4,"\tsubq $", offsetStr, ", ", subRegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	// to do: use element size below
+	char offsetStr[20];
+	snprintf(offsetStr,9,"%d",get1stDimensionbase(type));
+	char *inst = nssave(4,"\tsubq $", offsetStr, ", ", subRegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-		inst = nssave(2,"\timulq $4, ", subRegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	inst = nssave(2,"\timulq $4, ", subRegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-		/* compute element address */
-		inst = nssave(4,"\taddq ", subRegName, ", ", regName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-	  }
-	else {
-		char msg[80];
-
-		snprintf(msg,80,"Scalar variable %s used as an array",
-				(char*)SymGetFieldByIndex(globalSymtab,varIndex,SYM_NAME_FIELD));
-		yyerror(msg);
-	}
+	/* compute element address */
+	inst = nssave(4,"\taddq ", subRegName, ", ", get64bitIntegerRegisterName(reg));
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	
 	freeIntegerRegister(subIndex);
 
-	return regIndex;
+	return reg;
 
 }
 
@@ -791,7 +720,7 @@ static char* makeDataDeclaration(DList dataList, char* str) {
 	   labelcount = (int)SymGetFieldByIndex(globalSymtab,symIndex,SYMTAB_OFFSET_FIELD);
 	   snprintf(strLabel,15,".string_const%d",labelcount);
 	}
-	
+
 	return strLabel;
 }
 
@@ -897,7 +826,7 @@ int emitIfTest(DList instList, int regIndex) {
 
 	int treg = allocateIntegerRegister();
 	char *symReg = getIntegerRegisterName(treg);
-	
+
 	char* inst = nssave(2,"\tmovl $-1, ", symReg);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
@@ -974,7 +903,7 @@ int emitWhileLoopTest(DList instList, int regIndex) {
 
 	int treg = allocateIntegerRegister();
 	char *symReg = getIntegerRegisterName(treg);
-	
+
 	char* inst = nssave(2,"\tmovl $-1, ", symReg);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 

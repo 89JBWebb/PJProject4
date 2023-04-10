@@ -36,7 +36,7 @@ EXTERN(void, emitWhileLoopBackBranch,(DList instList, int beginLabelIndex, int e
 
 EXTERN(int, emitComputeVariableAddress,(DList instList, int varIndex));
 EXTERN(int, emitComputeLocalAddress,(DList instList, char *name));
-EXTERN(int, emitComputeArrayAddress, (DList instList, int varIndex, int subIndex));
+EXTERN(int, emitComputeArrayAddress, (DList instList, char *name, int subIndex));
 EXTERN(int, emitCompute2DArrayAddress, (DList instList, int varIndex, int subIndex1, int subIndex2));
 
 EXTERN(int, emitLoadVariable,(DList instList, int varIndex));

@@ -1,0 +1,129 @@
+	.section	.rodata
+	.string_const0: .string "%d\n"
+	.text
+	.globl t
+	.type t,@function
+t:	nop
+	pushq %rbp
+	movq %rsp, %rbp
+	subq $48, %rsp
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl $2, %ecx
+	movl %ecx, (%rbx)
+.L0:	nop
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl (%rbx), %ecx
+	movl $11, %ebx
+	cmpl %ebx, %ecx
+	movl $0, %ecx
+	movl $1, %ebx
+	cmovle %ebx, %ecx
+	movl $-1, %ebx
+	testl %ecx, %ebx
+	je .L1
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl (%rbx), %ecx
+	movq %rbp, %r8
+	subq $48, %r8
+	subq $0, %rcx
+	imulq $4, %rcx
+	addq %rcx, %r8
+	movq %rbp, %rcx
+	subq $4, %rcx
+	movl (%rcx), %r9d
+	movl $1, %ecx
+	subl %ecx, %r9d
+	movq %rbp, %r10
+	movq (%r10), %r10
+	subq $44, %r10
+	subq $0, %r9
+	imulq $4, %r9
+	addq %r9, %r10
+	movl (%r10), %r9d
+	movl %r9d, (%r8)
+	movq %rbp, %r8
+	subq $4, %r8
+	movq %rbp, %r9
+	subq $4, %r9
+	movl (%r9), %r10d
+	movl $1, %r9d
+	addl %r9d, %r10d
+	movl %r10d, (%r8)
+	jmp .L0
+.L1:	 nop
+	movl $5, %r8d
+	movq %rbp, %r10
+	subq $48, %r10
+	subq $0, %r8
+	imulq $4, %r8
+	addq %r8, %r10
+	movl (%r10), %r8d
+	movl %r8d, %eax
+	movq %rbp, %rsp
+	popq %rbp
+	ret
+	.globl main
+	.type main,@function
+main:	nop
+	pushq %rbp
+	movq %rsp, %rbp
+	subq $44, %rsp
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl $1, %ecx
+	movl %ecx, (%rbx)
+.L2:	nop
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl (%rbx), %ecx
+	movl $10, %ebx
+	cmpl %ebx, %ecx
+	movl $0, %ecx
+	movl $1, %ebx
+	cmovle %ebx, %ecx
+	movl $-1, %ebx
+	testl %ecx, %ebx
+	je .L3
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl (%rbx), %ecx
+	movq %rbp, %r8
+	subq $44, %r8
+	subq $0, %rcx
+	imulq $4, %rcx
+	addq %rcx, %r8
+	movq %rbp, %rcx
+	subq $4, %rcx
+	movl (%rcx), %r9d
+	movl %r9d, (%r8)
+	movq %rbp, %rcx
+	subq $4, %rcx
+	movq %rbp, %r8
+	subq $4, %r8
+	movl (%r8), %r9d
+	movl $1, %r8d
+	addl %r8d, %r9d
+	movl %r9d, (%rcx)
+	jmp .L2
+.L3:	 nop
+	movq %rbp, %rcx
+	subq $4, %rcx
+	push %rbx
+	push %rcx
+	call t
+	pop %rcx
+	pop %rbx
+	movl %eax, %r8d
+	movl %r8d, (%rcx)
+	movq %rbp, %rcx
+	subq $4, %rcx
+	movl (%rcx), %r8d
+	leaq .string_const0(%rip), %rdi
+	movl %r8d, %esi
+	movl $0, %eax
+	call printf@PLT
+	leave
+	ret
