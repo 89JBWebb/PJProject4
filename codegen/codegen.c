@@ -458,7 +458,6 @@ int emitDivideExpression(DList instList, int leftOperand, int rightOperand) {
 		return leftOperand;
 }
 
-
 /**
  * Add an instruction to compute the address of a variable.
  *
@@ -466,22 +465,21 @@ int emitDivideExpression(DList instList, int leftOperand, int rightOperand) {
  * @param varIndex the register index for a variable
  * @return the register index of the address register
  */
-int emitComputeVariableAddress(DList instList, int varIndex) {
+int emitComputeGlobalAddress(DList instList, char *name) {
 	
   int addrRegIndex = allocateIntegerRegister();   
   char* addrRegName = (char*)get64bitIntegerRegisterName(addrRegIndex);
 
-  int offset = (int)SymGetFieldByIndex(globalSymtab,varIndex,SYMTAB_OFFSET_FIELD);
+  int offset = (int)SymGetField(globalSymtab, name,"offset");
   char offsetStr[10];
   snprintf(offsetStr,9,"%d",offset);
 
   char *inst; 
   inst = nssave(2,"\tleaq _gp(%rip), ", addrRegName);
   dlinkAppend(instList,dlinkNodeAlloc(inst));
-  if(offset != 0){
-  	inst = nssave(4,"\taddq $", offsetStr, ", ", addrRegName);
-  	dlinkAppend(instList,dlinkNodeAlloc(inst));
-  }
+  inst = nssave(4,"\taddq $", offsetStr, ", ", addrRegName);
+  dlinkAppend(instList,dlinkNodeAlloc(inst));
+  
   return addrRegIndex;
 }
 
@@ -499,18 +497,12 @@ int emitComputeLocalAddress(DList instList, char *name) {
 
 	int backtraces = 0;
 	int offset = 0;
-	DNode node = dlinkHead(localSymStack);
-	int index = 0;
 
-	while (node != NULL) {
-		if (SymQueryIndex((SymTable)dlinkNodeAtom(node),name) != SYM_INVALID_INDEX){
-			break;
-		}
-		backtraces++;
-		node = dlinkNext(node);
+	offset = (int)SymGetField( currentSymtab(localSymStack), name, "offset");
+	if(offset == -1){
+		freeIntegerRegister(addrRegIndex);
+		return emitComputeGlobalAddress(instList, name);
 	}
-
-	offset = (int)SymGetField((SymTable)dlinkNodeAtom(node), name, "offset");
 
 	char offsetStr[10];
 	snprintf(offsetStr,9,"%d",offset);
@@ -519,11 +511,6 @@ int emitComputeLocalAddress(DList instList, char *name) {
 
 	inst = nssave(2,"\tmovq %rbp, ", addrRegName);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
-
-	for(int i = 0; i < backtraces; i++){
-		inst = nssave(4,"\tmovq (", addrRegName, "), ", addrRegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));	
-	}
 
 	if(offset != 0){
 		inst = nssave(4,"\tsubq $", offsetStr, ", ", addrRegName);

@@ -1,4 +1,5 @@
 	.section	.rodata
+	.comm _gp, 44, 4
 	.string_const0: .string "%d\n"
 	.text
 	.globl t
@@ -28,7 +29,7 @@ t:	nop
 	movl (%rbx), %ecx
 	movq %rbp, %r8
 	subq $48, %r8
-	subq $0, %rcx
+	subq $1, %rcx
 	imulq $4, %rcx
 	addq %rcx, %r8
 	movq %rbp, %rcx
@@ -36,10 +37,9 @@ t:	nop
 	movl (%rcx), %r9d
 	movl $1, %ecx
 	subl %ecx, %r9d
-	movq %rbp, %r10
-	movq (%r10), %r10
-	subq $44, %r10
-	subq $0, %r9
+	leaq _gp(%rip), %r10
+	addq $44, %r10
+	subq $1, %r9
 	imulq $4, %r9
 	addq %r9, %r10
 	movl (%r10), %r9d
@@ -57,7 +57,7 @@ t:	nop
 	movl $5, %r8d
 	movq %rbp, %r10
 	subq $48, %r10
-	subq $0, %r8
+	subq $1, %r8
 	imulq $4, %r8
 	addq %r8, %r10
 	movl (%r10), %r8d
@@ -70,14 +70,13 @@ t:	nop
 main:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $44, %rsp
-	movq %rbp, %rbx
-	subq $4, %rbx
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
 	movl $1, %ecx
 	movl %ecx, (%rbx)
 .L2:	nop
-	movq %rbp, %rbx
-	subq $4, %rbx
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
 	movl (%rbx), %ecx
 	movl $10, %ebx
 	cmpl %ebx, %ecx
@@ -87,30 +86,30 @@ main:	nop
 	movl $-1, %ebx
 	testl %ecx, %ebx
 	je .L3
-	movq %rbp, %rbx
-	subq $4, %rbx
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
 	movl (%rbx), %ecx
-	movq %rbp, %r8
-	subq $44, %r8
-	subq $0, %rcx
+	leaq _gp(%rip), %r8
+	addq $44, %r8
+	subq $1, %rcx
 	imulq $4, %rcx
 	addq %rcx, %r8
-	movq %rbp, %rcx
-	subq $4, %rcx
+	leaq _gp(%rip), %rcx
+	addq $4, %rcx
 	movl (%rcx), %r9d
 	movl %r9d, (%r8)
-	movq %rbp, %rcx
-	subq $4, %rcx
-	movq %rbp, %r8
-	subq $4, %r8
+	leaq _gp(%rip), %rcx
+	addq $4, %rcx
+	leaq _gp(%rip), %r8
+	addq $4, %r8
 	movl (%r8), %r9d
 	movl $1, %r8d
 	addl %r8d, %r9d
 	movl %r9d, (%rcx)
 	jmp .L2
 .L3:	 nop
-	movq %rbp, %rcx
-	subq $4, %rcx
+	leaq _gp(%rip), %rcx
+	addq $4, %rcx
 	push %rbx
 	push %rcx
 	call t
@@ -118,8 +117,8 @@ main:	nop
 	pop %rbx
 	movl %eax, %r8d
 	movl %r8d, (%rcx)
-	movq %rbp, %rcx
-	subq $4, %rcx
+	leaq _gp(%rip), %rcx
+	addq $4, %rcx
 	movl (%rcx), %r8d
 	leaq .string_const0(%rip), %rdi
 	movl %r8d, %esi

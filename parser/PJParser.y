@@ -35,7 +35,7 @@ static DList dataList;
 char *fileName;
 
 int globalOffset = 0;
-int localOffset = 8;
+int isGlobal = 1;
 extern int yylineno;
 extern char *yytext;
 extern FILE *yyin;
@@ -133,31 +133,32 @@ Program : ProgramHeadAndProcedures CompoundStatement T_DOT
 ProgramHeadAndProcedures : ProgramHead Procedures
 		{
 			emitProcedurePrologue(instList,$1);
-			raiseStack(instList);
 		};
 
 ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 		{
 			$$ = "main";
+			globalSymtab = endScope(localSymStack);
+			globalOffset = (int)SymGetField(globalSymtab, " ", "offset");
 		};
 
 Decls : T_VAR DeclList
-		|
+		| {
+			
+			beginScope(localSymStack);
+		}
 		;
 
 DeclList : IdentifierList T_COLON Type T_SEMICOLON
 		{
-
+			
 			//begin scope
 			beginScope(localSymStack);
 
 			//add symbols to the current scope
 			dlinkApply1($1,(DLinkApply1Func)addIdToSymStack, (Generic)$3);
 			dlinkFreeNodes($1);
-
-			//reuse if global is still a thing
-			//dlinkApply1($1,(DLinkApply1Func)addIdToSymtab, (Generic)$3);
-			//dlinkFreeNodes($1);
+			
 		}
 		 | DeclList IdentifierList T_COLON Type T_SEMICOLON
 		{
@@ -532,6 +533,7 @@ static void initialize(char* inputFileName) {
 	
 	globalSymtab = SymInit(SYMTABLE_SIZE);
 	localSymStack = symtabStackInit();
+	beginScope(localSymStack);
 	SymInitField(globalSymtab,SYMTAB_OFFSET_FIELD,(Generic)-1,NULL);
 	initRegisters();
 	
