@@ -95,11 +95,12 @@ char *fileName;
 
 int globalOffset = 0;
 int isGlobal = 1;
+int jumpPoints = 0;
 extern int yylineno;
 extern char *yytext;
 extern FILE *yyin;
 
-#line 103 "PJParser.c" /* yacc.c:339  */
+#line 104 "PJParser.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -191,7 +192,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 104 "PJParser.y" /* yacc.c:355  */
+#line 105 "PJParser.y" /* yacc.c:355  */
 
 	int   regIndex;
 	int	typeId;
@@ -202,7 +203,7 @@ union YYSTYPE
 	ArrayBounds bounds;
    int     value;
 
-#line 206 "PJParser.c" /* yacc.c:355  */
+#line 207 "PJParser.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -219,7 +220,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 223 "PJParser.c" /* yacc.c:358  */
+#line 224 "PJParser.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -521,14 +522,14 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   126,   126,   133,   138,   145,   146,   152,   163,   172,
-     177,   183,   187,   193,   197,   201,   206,   210,   215,   222,
-     226,   231,   232,   235,   246,   260,   267,   271,   272,   273,
-     274,   275,   276,   279,   284,   288,   293,   298,   303,   308,
-     313,   319,   323,   327,   333,   337,   342,   344,   348,   357,
-     360,   361,   364,   368,   372,   376,   380,   384,   388,   394,
-     398,   402,   406,   412,   414,   418,   422,   427,   431,   435,
-     439,   455,   460,   467,   473,   483,   484,   489,   493,   497
+       0,   127,   127,   134,   139,   146,   147,   153,   164,   173,
+     178,   184,   188,   194,   198,   202,   207,   211,   216,   223,
+     227,   232,   233,   236,   247,   261,   268,   272,   273,   274,
+     275,   276,   277,   280,   285,   290,   296,   308,   316,   324,
+     333,   341,   345,   349,   354,   358,   362,   364,   368,   377,
+     380,   381,   384,   388,   392,   396,   400,   404,   408,   414,
+     418,   422,   426,   432,   434,   438,   442,   447,   451,   455,
+     459,   475,   480,   487,   493,   503,   504,   509,   513,   517
 };
 #endif
 
@@ -1412,44 +1413,44 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 127 "PJParser.y" /* yacc.c:1646  */
+#line 128 "PJParser.y" /* yacc.c:1646  */
     {
 			emitProcedureExit(instList);
 			emitDataPrologue(dataList);
 			emitInstructions(instList);
 		}
-#line 1422 "PJParser.c" /* yacc.c:1646  */
+#line 1423 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 134 "PJParser.y" /* yacc.c:1646  */
+#line 135 "PJParser.y" /* yacc.c:1646  */
     {
 			emitProcedurePrologue(instList,(yyvsp[-1].name));
 		}
-#line 1430 "PJParser.c" /* yacc.c:1646  */
+#line 1431 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 139 "PJParser.y" /* yacc.c:1646  */
+#line 140 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.name) = "main";
 			globalSymtab = endScope(localSymStack);
 			globalOffset = (int)SymGetField(globalSymtab, " ", "offset");
 		}
-#line 1440 "PJParser.c" /* yacc.c:1646  */
+#line 1441 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 146 "PJParser.y" /* yacc.c:1646  */
+#line 147 "PJParser.y" /* yacc.c:1646  */
     {
 			
 			beginScope(localSymStack);
 		}
-#line 1449 "PJParser.c" /* yacc.c:1646  */
+#line 1450 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 153 "PJParser.y" /* yacc.c:1646  */
+#line 154 "PJParser.y" /* yacc.c:1646  */
     {
 			
 			//begin scope
@@ -1460,11 +1461,11 @@ yyreduce:
 			dlinkFreeNodes((yyvsp[-3].idList));
 			
 		}
-#line 1464 "PJParser.c" /* yacc.c:1646  */
+#line 1465 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 164 "PJParser.y" /* yacc.c:1646  */
+#line 165 "PJParser.y" /* yacc.c:1646  */
     {
 
 			//add symbols to the current scope
@@ -1472,110 +1473,110 @@ yyreduce:
 			dlinkFreeNodes((yyvsp[-3].idList));			
 
 		}
-#line 1476 "PJParser.c" /* yacc.c:1646  */
+#line 1477 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 173 "PJParser.y" /* yacc.c:1646  */
+#line 174 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.idList) = dlinkListAlloc(NULL);
 			dlinkAppend((yyval.idList),dlinkNodeAlloc((Generic)(yyvsp[0].name)));
 		}
-#line 1485 "PJParser.c" /* yacc.c:1646  */
+#line 1486 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 178 "PJParser.y" /* yacc.c:1646  */
+#line 179 "PJParser.y" /* yacc.c:1646  */
     {
 			dlinkAppend((yyvsp[-2].idList),dlinkNodeAlloc((Generic)(yyvsp[0].name)));
 			(yyval.idList) = (yyvsp[-2].idList);
 		}
-#line 1494 "PJParser.c" /* yacc.c:1646  */
+#line 1495 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 184 "PJParser.y" /* yacc.c:1646  */
+#line 185 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.typeId) = (yyvsp[0].typeId);
 		}
-#line 1502 "PJParser.c" /* yacc.c:1646  */
+#line 1503 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 188 "PJParser.y" /* yacc.c:1646  */
+#line 189 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.typeId) = (yyvsp[0].typeId);
 	 	}
-#line 1510 "PJParser.c" /* yacc.c:1646  */
+#line 1511 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 194 "PJParser.y" /* yacc.c:1646  */
+#line 195 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.typeId) = INTEGER_TYPE;
 		}
-#line 1518 "PJParser.c" /* yacc.c:1646  */
+#line 1519 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 198 "PJParser.y" /* yacc.c:1646  */
+#line 199 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.typeId) = INTEGER_TYPE;
 		}
-#line 1526 "PJParser.c" /* yacc.c:1646  */
+#line 1527 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 202 "PJParser.y" /* yacc.c:1646  */
+#line 203 "PJParser.y" /* yacc.c:1646  */
     {
 			//$$ = FLOAT_TYPE ;
 		}
-#line 1534 "PJParser.c" /* yacc.c:1646  */
+#line 1535 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 207 "PJParser.y" /* yacc.c:1646  */
+#line 208 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.typeId) = newArrayType(1, (yyvsp[-3].bounds).lowerBound, (yyvsp[-3].bounds).upperBound, 0, 0, (yyvsp[0].typeId));
 		}
-#line 1542 "PJParser.c" /* yacc.c:1646  */
+#line 1543 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 211 "PJParser.y" /* yacc.c:1646  */
+#line 212 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.typeId) = newArrayType(1, (yyvsp[-5].bounds).lowerBound, (yyvsp[-5].bounds).upperBound, (yyvsp[-3].bounds).lowerBound, (yyvsp[-3].bounds).upperBound, (yyvsp[0].typeId));
 		}
-#line 1550 "PJParser.c" /* yacc.c:1646  */
+#line 1551 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 216 "PJParser.y" /* yacc.c:1646  */
+#line 217 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.bounds).lowerBound = (yyvsp[-2].value);
 			(yyval.bounds).upperBound = (yyvsp[0].value);
 		}
-#line 1559 "PJParser.c" /* yacc.c:1646  */
+#line 1560 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 223 "PJParser.y" /* yacc.c:1646  */
+#line 224 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.value) = -atoi((yyvsp[0].name));
 		}
-#line 1567 "PJParser.c" /* yacc.c:1646  */
+#line 1568 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 227 "PJParser.y" /* yacc.c:1646  */
+#line 228 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.value) = atoi((yyvsp[0].name));
 		}
-#line 1575 "PJParser.c" /* yacc.c:1646  */
+#line 1576 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 235 "PJParser.y" /* yacc.c:1646  */
+#line 236 "PJParser.y" /* yacc.c:1646  */
     {
 			//postamble
 				//restore callee-saved regs
@@ -1586,11 +1587,11 @@ yyreduce:
 			//remove symtab from stack
 			endScope(localSymStack);
 		}
-#line 1590 "PJParser.c" /* yacc.c:1646  */
+#line 1591 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 246 "PJParser.y" /* yacc.c:1646  */
+#line 247 "PJParser.y" /* yacc.c:1646  */
     {
 			//preamble
 				//extend AR for locals
@@ -1604,146 +1605,168 @@ yyreduce:
 			//add variables to symbol table
 
     	}
-#line 1608 "PJParser.c" /* yacc.c:1646  */
+#line 1609 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 260 "PJParser.y" /* yacc.c:1646  */
+#line 261 "PJParser.y" /* yacc.c:1646  */
     {
 			//identifier to function
 			emitProcedurePrologue(instList, (yyvsp[-3].name));
 
 			(yyval.name) = (yyvsp[-3].name);
 		}
-#line 1619 "PJParser.c" /* yacc.c:1646  */
+#line 1620 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 267 "PJParser.y" /* yacc.c:1646  */
+#line 268 "PJParser.y" /* yacc.c:1646  */
     {
 			
 		}
-#line 1627 "PJParser.c" /* yacc.c:1646  */
+#line 1628 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 280 "PJParser.y" /* yacc.c:1646  */
+#line 281 "PJParser.y" /* yacc.c:1646  */
     {
 			emitAssignment(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1635 "PJParser.c" /* yacc.c:1646  */
+#line 1636 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 285 "PJParser.y" /* yacc.c:1646  */
+#line 286 "PJParser.y" /* yacc.c:1646  */
     {
-			emitEndBranchTarget(instList,(yyvsp[-2].symIndex));
+			//jump location after else
+			emitJumpPoint(instList, (yyvsp[-2].symIndex));
 		}
-#line 1643 "PJParser.c" /* yacc.c:1646  */
+#line 1645 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 289 "PJParser.y" /* yacc.c:1646  */
+#line 291 "PJParser.y" /* yacc.c:1646  */
     {
-			emitEndBranchTarget(instList,(yyvsp[0].symIndex));
+			//jump location after else
+			emitJumpPoint(instList, (yyvsp[0].symIndex));
 		}
-#line 1651 "PJParser.c" /* yacc.c:1646  */
+#line 1654 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 294 "PJParser.y" /* yacc.c:1646  */
+#line 297 "PJParser.y" /* yacc.c:1646  */
     {
-		   	(yyval.symIndex) = emitThenBranch(instList,(yyvsp[-2].symIndex));
-	    }
-#line 1659 "PJParser.c" /* yacc.c:1646  */
+			//jump after else
+			(yyval.symIndex) = jumpPoints;
+			emitJump(instList, jumpPoints);
+			jumpPoints+=1;
+
+			//jump location of if condition is false
+			emitJumpPoint(instList, (yyvsp[-2].symIndex));
+
+		}
+#line 1669 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 299 "PJParser.y" /* yacc.c:1646  */
+#line 309 "PJParser.y" /* yacc.c:1646  */
     {
-			(yyval.symIndex) = emitIfTest(instList,(yyvsp[0].regIndex));
+			//jump if false
+			(yyval.symIndex) = jumpPoints;
+			emitCJump(instList, (yyvsp[0].regIndex), jumpPoints);
+			jumpPoints+=1;
 		}
-#line 1667 "PJParser.c" /* yacc.c:1646  */
+#line 1680 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 304 "PJParser.y" /* yacc.c:1646  */
+#line 317 "PJParser.y" /* yacc.c:1646  */
     {
-			emitWhileLoopBackBranch(instList,(yyvsp[-3].symIndex),(yyvsp[-2].symIndex));
-		}
-#line 1675 "PJParser.c" /* yacc.c:1646  */
-    break;
-
-  case 39:
-#line 309 "PJParser.y" /* yacc.c:1646  */
-    {
-			(yyval.symIndex) = emitWhileLoopTest(instList,(yyvsp[0].regIndex));
-		}
-#line 1683 "PJParser.c" /* yacc.c:1646  */
-    break;
-
-  case 40:
-#line 314 "PJParser.y" /* yacc.c:1646  */
-    {
-			(yyval.symIndex) = emitWhileLoopLandingPad(instList);
+			//jump back to start of loop
+			emitJump(instList, (yyvsp[-3].symIndex));
+			//jumping point for end of loop
+			emitJumpPoint(instList, (yyvsp[-2].symIndex));
 		}
 #line 1691 "PJParser.c" /* yacc.c:1646  */
     break;
 
+  case 39:
+#line 325 "PJParser.y" /* yacc.c:1646  */
+    {
+			//test
+			//if false jump after
+			(yyval.symIndex) = jumpPoints;
+        	emitCJump(instList, (yyvsp[0].regIndex), jumpPoints);
+        	jumpPoints+=1;
+		}
+#line 1703 "PJParser.c" /* yacc.c:1646  */
+    break;
+
+  case 40:
+#line 334 "PJParser.y" /* yacc.c:1646  */
+    {
+			//creating jump point beginning of loop
+			(yyval.symIndex) = jumpPoints;
+			emitJumpPoint(instList, jumpPoints);
+			jumpPoints+=1;
+		}
+#line 1714 "PJParser.c" /* yacc.c:1646  */
+    break;
+
   case 41:
-#line 320 "PJParser.y" /* yacc.c:1646  */
+#line 342 "PJParser.y" /* yacc.c:1646  */
     {
 			emitReadVariable(instList,dataList,  (yyvsp[-1].regIndex));
 		}
-#line 1699 "PJParser.c" /* yacc.c:1646  */
+#line 1722 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 324 "PJParser.y" /* yacc.c:1646  */
+#line 346 "PJParser.y" /* yacc.c:1646  */
     {
 			emitWriteExpression(instList, dataList, (yyvsp[-4].typeId), (yyvsp[-2].regIndex), (yyvsp[-1].name));
 		}
-#line 1707 "PJParser.c" /* yacc.c:1646  */
+#line 1730 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 328 "PJParser.y" /* yacc.c:1646  */
+#line 350 "PJParser.y" /* yacc.c:1646  */
     {
 			emitWriteString(instList, dataList, (yyvsp[-4].typeId), (yyvsp[-2].name), (yyvsp[-1].name));
 		}
-#line 1715 "PJParser.c" /* yacc.c:1646  */
+#line 1738 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 334 "PJParser.y" /* yacc.c:1646  */
+#line 355 "PJParser.y" /* yacc.c:1646  */
     {
 		   (yyval.name) = (yyvsp[0].name);
 		}
-#line 1723 "PJParser.c" /* yacc.c:1646  */
+#line 1746 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 337 "PJParser.y" /* yacc.c:1646  */
+#line 358 "PJParser.y" /* yacc.c:1646  */
     {
 		   (yyval.name) = NULL;
 		}
-#line 1731 "PJParser.c" /* yacc.c:1646  */
+#line 1754 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 343 "PJParser.y" /* yacc.c:1646  */
+#line 363 "PJParser.y" /* yacc.c:1646  */
     {(yyval.typeId) = IS_WRITE;}
-#line 1737 "PJParser.c" /* yacc.c:1646  */
+#line 1760 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 345 "PJParser.y" /* yacc.c:1646  */
+#line 365 "PJParser.y" /* yacc.c:1646  */
     {(yyval.typeId) = IS_WRITELN;}
-#line 1743 "PJParser.c" /* yacc.c:1646  */
+#line 1766 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 349 "PJParser.y" /* yacc.c:1646  */
+#line 369 "PJParser.y" /* yacc.c:1646  */
     {
 			//restore callee-saved reg
 			//discard local data
@@ -1751,153 +1774,153 @@ yyreduce:
 			//jump to return address
 			emitProcedureExitWithReturn(instList, (yyvsp[-1].regIndex));
 		}
-#line 1755 "PJParser.c" /* yacc.c:1646  */
+#line 1778 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 365 "PJParser.y" /* yacc.c:1646  */
+#line 385 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = (yyvsp[0].regIndex);
 		}
-#line 1763 "PJParser.c" /* yacc.c:1646  */
+#line 1786 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 369 "PJParser.y" /* yacc.c:1646  */
+#line 389 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitEqualExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1771 "PJParser.c" /* yacc.c:1646  */
+#line 1794 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 373 "PJParser.y" /* yacc.c:1646  */
+#line 393 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitNotEqualExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1779 "PJParser.c" /* yacc.c:1646  */
+#line 1802 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 377 "PJParser.y" /* yacc.c:1646  */
+#line 397 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitLessEqualExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1787 "PJParser.c" /* yacc.c:1646  */
+#line 1810 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 381 "PJParser.y" /* yacc.c:1646  */
+#line 401 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitLessThanExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1795 "PJParser.c" /* yacc.c:1646  */
+#line 1818 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 385 "PJParser.y" /* yacc.c:1646  */
+#line 405 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitGreaterEqualExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1803 "PJParser.c" /* yacc.c:1646  */
+#line 1826 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 389 "PJParser.y" /* yacc.c:1646  */
+#line 409 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitGreaterThanExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1811 "PJParser.c" /* yacc.c:1646  */
+#line 1834 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 395 "PJParser.y" /* yacc.c:1646  */
+#line 415 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = (yyvsp[0].regIndex);
 		}
-#line 1819 "PJParser.c" /* yacc.c:1646  */
+#line 1842 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 399 "PJParser.y" /* yacc.c:1646  */
+#line 419 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitOrExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1827 "PJParser.c" /* yacc.c:1646  */
+#line 1850 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 403 "PJParser.y" /* yacc.c:1646  */
+#line 423 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitAddExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1835 "PJParser.c" /* yacc.c:1646  */
+#line 1858 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 407 "PJParser.y" /* yacc.c:1646  */
+#line 427 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitSubtractExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1843 "PJParser.c" /* yacc.c:1646  */
+#line 1866 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 413 "PJParser.y" /* yacc.c:1646  */
+#line 433 "PJParser.y" /* yacc.c:1646  */
     {(yyval.regIndex) =(yyvsp[0].regIndex);}
-#line 1849 "PJParser.c" /* yacc.c:1646  */
+#line 1872 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 415 "PJParser.y" /* yacc.c:1646  */
+#line 435 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitMultiplyExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1857 "PJParser.c" /* yacc.c:1646  */
+#line 1880 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 419 "PJParser.y" /* yacc.c:1646  */
+#line 439 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitDivideExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1865 "PJParser.c" /* yacc.c:1646  */
+#line 1888 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 423 "PJParser.y" /* yacc.c:1646  */
+#line 443 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitAndExpression(instList,(yyvsp[-2].regIndex),(yyvsp[0].regIndex));
 		}
-#line 1873 "PJParser.c" /* yacc.c:1646  */
+#line 1896 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 428 "PJParser.y" /* yacc.c:1646  */
+#line 448 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitLoadVariable(instList, (yyvsp[0].regIndex));
 		}
-#line 1881 "PJParser.c" /* yacc.c:1646  */
+#line 1904 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 432 "PJParser.y" /* yacc.c:1646  */
+#line 452 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = (yyvsp[0].regIndex);
 		}
-#line 1889 "PJParser.c" /* yacc.c:1646  */
+#line 1912 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 436 "PJParser.y" /* yacc.c:1646  */
+#line 456 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = emitNotExpression(instList,(yyvsp[0].regIndex));
 		}
-#line 1897 "PJParser.c" /* yacc.c:1646  */
+#line 1920 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 440 "PJParser.y" /* yacc.c:1646  */
+#line 460 "PJParser.y" /* yacc.c:1646  */
     {
 			//pre call
 				//allocate AR
@@ -1913,40 +1936,40 @@ yyreduce:
 				//restore reference???
 				//parameters???
 		}
-#line 1917 "PJParser.c" /* yacc.c:1646  */
+#line 1940 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 456 "PJParser.y" /* yacc.c:1646  */
+#line 476 "PJParser.y" /* yacc.c:1646  */
     {
 			(yyval.regIndex) = (yyvsp[-1].regIndex);
 		}
-#line 1925 "PJParser.c" /* yacc.c:1646  */
+#line 1948 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 461 "PJParser.y" /* yacc.c:1646  */
+#line 481 "PJParser.y" /* yacc.c:1646  */
     {
 			/*int symIndex = SymQueryIndex(globalSymtab,$1);
 			$$ = emitComputeVariableAddress(instList, symIndex);*/
 			char *name = (yyvsp[0].name);
 			(yyval.regIndex) = emitComputeLocalAddress(instList, (yyvsp[0].name));
 		}
-#line 1936 "PJParser.c" /* yacc.c:1646  */
+#line 1959 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 468 "PJParser.y" /* yacc.c:1646  */
+#line 488 "PJParser.y" /* yacc.c:1646  */
     {
 	
-			(yyval.regIndex) = emitComputeArrayAddress(instList, (yyvsp[-3].name), (yyvsp[-1].regIndex));
+			(yyval.regIndex) = emitComputeLocalArrayAddress(instList, (yyvsp[-3].name), (yyvsp[-1].regIndex));
 
 		}
-#line 1946 "PJParser.c" /* yacc.c:1646  */
+#line 1969 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 474 "PJParser.y" /* yacc.c:1646  */
+#line 494 "PJParser.y" /* yacc.c:1646  */
     {
 			/*int symIndex = SymQueryIndex(globalSymtab,$1);
 			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);*/
@@ -1954,44 +1977,44 @@ yyreduce:
 			//$$ = emitComputeLocalMatrixAddress(instList, $1, $3);
 
 		}
-#line 1958 "PJParser.c" /* yacc.c:1646  */
+#line 1981 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 485 "PJParser.y" /* yacc.c:1646  */
+#line 505 "PJParser.y" /* yacc.c:1646  */
     {   
 			char *negstr = nssave(2, "-", (yyvsp[0].name));
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,negstr); 
 		}
-#line 1967 "PJParser.c" /* yacc.c:1646  */
+#line 1990 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 490 "PJParser.y" /* yacc.c:1646  */
+#line 510 "PJParser.y" /* yacc.c:1646  */
     { 
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,(yyvsp[0].name)); 
 		}
-#line 1975 "PJParser.c" /* yacc.c:1646  */
+#line 1998 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 494 "PJParser.y" /* yacc.c:1646  */
+#line 514 "PJParser.y" /* yacc.c:1646  */
     { 
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,"1"); 
 		}
-#line 1983 "PJParser.c" /* yacc.c:1646  */
+#line 2006 "PJParser.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 498 "PJParser.y" /* yacc.c:1646  */
+#line 518 "PJParser.y" /* yacc.c:1646  */
     { 
 			(yyval.regIndex) = emitLoadIntegerConstant(instList,"0"); 
 		}
-#line 1991 "PJParser.c" /* yacc.c:1646  */
+#line 2014 "PJParser.c" /* yacc.c:1646  */
     break;
 
 
-#line 1995 "PJParser.c" /* yacc.c:1646  */
+#line 2018 "PJParser.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2219,7 +2242,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 503 "PJParser.y" /* yacc.c:1906  */
+#line 523 "PJParser.y" /* yacc.c:1906  */
 
 
 

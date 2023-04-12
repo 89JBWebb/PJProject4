@@ -36,6 +36,7 @@ char *fileName;
 
 int globalOffset = 0;
 int isGlobal = 1;
+int jumpPoints = 0;
 extern int yylineno;
 extern char *yytext;
 extern FILE *yyin;
@@ -283,38 +284,59 @@ Assignment : Variable T_ASSIGN Expr
 
 IfStatement : T_IF TestAndThen T_ELSE Statement
 		{
-			emitEndBranchTarget(instList,$2);
+			//jump location after else
+			emitJumpPoint(instList, $2);
 		}
 	    | T_IF TestAndThen
 		{
-			emitEndBranchTarget(instList,$2);
+			//jump location after else
+			emitJumpPoint(instList, $2);
 		};
 
 TestAndThen	: Test T_THEN Statement
-	    {
-		   	$$ = emitThenBranch(instList,$1);
-	    };
+		{
+			//jump after else
+			$$ = jumpPoints;
+			emitJump(instList, jumpPoints);
+			jumpPoints+=1;
+
+			//jump location of if condition is false
+			emitJumpPoint(instList, $1);
+
+		};
 
 Test : Expr
 		{
-			$$ = emitIfTest(instList,$1);
+			//jump if false
+			$$ = jumpPoints;
+			emitCJump(instList, $1, jumpPoints);
+			jumpPoints+=1;
 		};
 
 WhileStatement : WhileToken WhileExpr T_DO Statement
 		{
-			emitWhileLoopBackBranch(instList,$1,$2);
+			//jump back to start of loop
+			emitJump(instList, $1);
+			//jumping point for end of loop
+			emitJumpPoint(instList, $2);
 		};
 
 WhileExpr : Expr
 		{
-			$$ = emitWhileLoopTest(instList,$1);
+			//test
+			//if false jump after
+			$$ = jumpPoints;
+        	emitCJump(instList, $1, jumpPoints);
+        	jumpPoints+=1;
 		};
 
 WhileToken	: T_WHILE
 		{
-			$$ = emitWhileLoopLandingPad(instList);
+			//creating jump point beginning of loop
+			$$ = jumpPoints;
+			emitJumpPoint(instList, jumpPoints);
+			jumpPoints+=1;
 		};
-
 
 IOStatement : T_READ T_LPAREN Variable T_RPAREN
 		{
@@ -327,8 +349,7 @@ IOStatement : T_READ T_LPAREN Variable T_RPAREN
             | WriteToken T_LPAREN T_STRING OutputFormat T_RPAREN
 		{
 			emitWriteString(instList, dataList, $1, $3, $4);
-		}
-            ;
+		};
 
 OutputFormat : T_COLON T_INTNUM
         	{
@@ -336,8 +357,7 @@ OutputFormat : T_COLON T_INTNUM
 		} |
 		{
 		   $$ = NULL;
-		}
-		;
+		};
 
 WriteToken : T_WRITE
 		{$$ = IS_WRITE;}
@@ -467,7 +487,7 @@ Variable        : T_IDENTIFIER
         | T_IDENTIFIER T_LBRACKET Expr T_RBRACKET
 		{
 	
-			$$ = emitComputeArrayAddress(instList, $1, $3);
+			$$ = emitComputeLocalArrayAddress(instList, $1, $3);
 
 		}
 		| T_IDENTIFIER T_LBRACKET Expr T_COMMA Expr T_RBRACKET

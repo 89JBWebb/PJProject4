@@ -114,6 +114,34 @@ void emitAssignment(DList instList, int lhsRegIndex, int rhsRegIndex) {
 	freeIntegerRegister(rhsRegIndex);
 }
 
+void emitJumpPoint(DList instList, int jumpIndex){
+	char *inst;
+	char num[8];
+    sprintf(num, "%d", jumpIndex);
+	inst = nssave(3, "j", num, ": nop");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	
+}
+
+void emitJump(DList instList, int jumpIndex){
+	char *inst;
+	char num[8];
+   sprintf(num, "%d", jumpIndex);
+	inst = nssave(2, "\tjmp j", num);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+}
+
+void emitCJump(DList instList, int regIndex, int jumpIndex){
+	char *inst;
+   inst = nssave(2, "\tcmpl $1, ", getIntegerRegisterName(regIndex));
+   dlinkAppend(instList,dlinkNodeAlloc(inst));
+	freeIntegerRegister(regIndex);
+	char num[8];
+	sprintf(num, "%d", jumpIndex);
+	inst = nssave(2, "\tjne j", num);
+   dlinkAppend(instList,dlinkNodeAlloc(inst));
+}
+
 /**
  * Add the instructions needed to read a variable using the scanf system call.
  *
@@ -604,6 +632,51 @@ int emitCompute2DArrayAddress(DList instList, int varIndex, int subIndex1, int s
 
 }
 
+
+/**
+ * Compute the address of an local array element and store it in a register.
+ * If there is no local array then search for it in global symbal table
+ *
+ * @param instList a list of instructions
+ * @param varIndex the symbol table index of the array variable
+ * @param subIndex index of the register holding the subscript value
+ * @return the symbol table index of the register holding the address of the
+ * 		   array element.
+ */
+int emitComputeLocalArrayAddress(DList instList, char *name, int subIndex) {
+	int offset = (int)SymGetField(currentSymtab(localSymStack),name,"offset");
+	int type = (int)SymGetField(currentSymtab(localSymStack),name,"type");
+
+	if (offset == -1){
+		return emitComputeGlobalArrayAddress(instList, name, subIndex);
+	}
+
+	int regIndex = allocateIntegerRegister();
+	int reg = emitComputeLocalAddress(instList, name);
+
+	/* compute offset based on subscript */
+	char* subReg32Name = getIntegerRegisterName(subIndex);
+	char* subRegName = get64bitIntegerRegisterName(subIndex);
+
+	// to do: use element size below
+	char offsetStr[20];
+	snprintf(offsetStr,9,"%d",get1stDimensionbase(type));
+	char *inst = nssave(4,"\tsubq $", offsetStr, ", ", subRegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	inst = nssave(2,"\timulq $4, ", subRegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	/* compute element address */
+	inst = nssave(4,"\taddq ", subRegName, ", ", get64bitIntegerRegisterName(reg));
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	
+	freeIntegerRegister(subIndex);
+
+	return reg;
+
+}
+
 /**
  * Compute the address of an array element and store it in a register.
  *
@@ -613,7 +686,7 @@ int emitCompute2DArrayAddress(DList instList, int varIndex, int subIndex1, int s
  * @return the symbol table index of the register holding the address of the
  * 		   array element.
  */
-int emitComputeArrayAddress(DList instList, char *name, int subIndex) {
+int emitComputeGlobalArrayAddress(DList instList, char *name, int subIndex) {
 	int regIndex = allocateIntegerRegister();
 	int offset = (int)SymGetField(globalSymtab,name,"offset");
 	int type = (int)SymGetField(globalSymtab,name,"type");
@@ -837,7 +910,6 @@ int emitIfTest(DList instList, int regIndex) {
  */
 void emitEndBranchTarget(DList instList, int endLabelIndex) {
 	char* inst = nssave(2,SymGetFieldByIndex(globalSymtab,endLabelIndex,SYM_NAME_FIELD),":\t nop");
-
 	dlinkAppend(instList, dlinkNodeAlloc(inst));
 }
 
@@ -851,13 +923,9 @@ void emitEndBranchTarget(DList instList, int endLabelIndex) {
 int emitThenBranch(DList instList, int elseLabelIndex) {
 	char label[20];
 	makeLabel(label);
-
 	char* inst = nssave(2,"\tjmp ",label);
-
 	dlinkAppend(instList, dlinkNodeAlloc(inst));
-
 	emitEndBranchTarget(instList, elseLabelIndex);
-
 	return SymIndex(globalSymtab, label);
 }
 /**

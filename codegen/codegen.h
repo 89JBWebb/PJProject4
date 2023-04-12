@@ -7,6 +7,9 @@ EXTERN(void, emitProcedureExitWithReturn, (DList instList, int regIndex));
 EXTERN(void, emitProcedureExit, (DList instList));
 EXTERN(void, emitDataPrologue, (DList dataList));
 EXTERN(void, emitInstructions,(DList list));
+EXTERN(void, emitJumpPoint, (DList instList, int jumpIndex));
+EXTERN(void, emitJump, (DList instList, int jumpIndex));
+EXTERN(void, emitCJump, (DList instList, int regIndex, int jumpIndex));
 EXTERN(void, emitAssignment, (DList instList, int lhsRegIndex, int rhsRegIndex));
 EXTERN(void, emitReadVariable, (DList instList, DList dataList, int addrIndex));
 EXTERN(void, emitWriteExpression, (DList instList, DList dataList, int writeType, int regIndex, char *length));
@@ -36,7 +39,8 @@ EXTERN(void, emitWhileLoopBackBranch,(DList instList, int beginLabelIndex, int e
 
 EXTERN(int, emitComputeVariableAddress,(DList instList, int varIndex));
 EXTERN(int, emitComputeLocalAddress,(DList instList, char *name));
-EXTERN(int, emitComputeArrayAddress, (DList instList, char *name, int subIndex));
+EXTERN(int, emitComputeLocalArrayAddress, (DList instList, char *name, int subIndex));
+EXTERN(int, emitComputeGlobalArrayAddress, (DList instList, char *name, int subIndex));
 EXTERN(int, emitCompute2DArrayAddress, (DList instList, int varIndex, int subIndex1, int subIndex2));
 
 EXTERN(int, emitLoadVariable,(DList instList, int varIndex));
