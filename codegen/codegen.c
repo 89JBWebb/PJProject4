@@ -182,7 +182,7 @@ void emitReadVariable(DList instList, DList dataList, int addrIndex) {
 	inst = ssave("\tmovl $0, %eax");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	emitCallNoReturn(instList, "printf@PLT");
+	emitCallNoReturn(instList, "scanf@PLT");
 
 	freeIntegerRegister(addrIndex);
 }
@@ -854,10 +854,10 @@ void emitProcedureExitWithReturn(DList instList, int regIndex) {
 	char *inst = nssave(3, "\tmovl ", getIntegerRegisterName(regIndex), ", %eax");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	inst = ssave("addq $8, %rsp");
+	inst = ssave("\taddq $8, %rsp");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	int *toSave = getCallerSavedRegisters();
+	int *toSave = getCalleeSavedRegisters();
 	for(int i = 4; i >= 0; i--){
 		inst = nssave(2,"\tpopq ", get64bitIntegerRegisterName(toSave[i]));
   		dlinkAppend(instList,dlinkNodeAlloc(inst));

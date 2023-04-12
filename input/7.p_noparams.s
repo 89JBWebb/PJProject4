@@ -20,12 +20,12 @@ a1:	nop
 	call printf@PLT
 	movl $0, %ebx
 	movl %ebx, %eax
-addq $8, %rsp
-	popq %r11
-	popq %r10
-	popq %r9
-	popq %r8
-	popq %rcx
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -52,12 +52,12 @@ a2:	nop
 	call printf@PLT
 	movl $0, %ebx
 	movl %ebx, %eax
-addq $8, %rsp
-	popq %r11
-	popq %r10
-	popq %r9
-	popq %r8
-	popq %rcx
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -89,12 +89,12 @@ a3:	nop
 	call printf@PLT
 	movl $0, %ebx
 	movl %ebx, %eax
-addq $8, %rsp
-	popq %r11
-	popq %r10
-	popq %r9
-	popq %r8
-	popq %rcx
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -131,12 +131,12 @@ a4:	nop
 	call printf@PLT
 	movl $0, %ebx
 	movl %ebx, %eax
-addq $8, %rsp
-	popq %r11
-	popq %r10
-	popq %r9
-	popq %r8
-	popq %rcx
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret

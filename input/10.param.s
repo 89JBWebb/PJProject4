@@ -7,7 +7,12 @@
 b4:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movl $4, %ebx
 	leaq .string_const0(%rip), %rdi
 	movl %ebx, %esi
@@ -28,6 +33,12 @@ b4:	nop
 	movl $1, %ebx
 	addl %ebx, %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -36,7 +47,13 @@ b4:	nop
 d2:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $4, %rsp
+	subq $16, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	leaq _gp(%rip), %rbx
 	addq $8, %rbx
 	movl (%rbx), %ecx
@@ -71,6 +88,12 @@ d2:	nop
 	movl %r8d, (%rbx)
 	movl $1, %ebx
 	movl %ebx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -79,7 +102,12 @@ d2:	nop
 d3:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	leaq _gp(%rip), %rbx
 	addq $4, %rbx
 	leaq _gp(%rip), %rcx
@@ -114,6 +142,12 @@ d3:	nop
 	addq $12, %rbx
 	movl (%rbx), %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -122,7 +156,13 @@ d3:	nop
 d1:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $4, %rsp
+	subq $16, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movq %rbp, %rbx
 	subq $4, %rbx
 	leaq _gp(%rip), %rcx
@@ -231,6 +271,12 @@ d1:	nop
 	subq $4, %rbx
 	movl (%rbx), %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret

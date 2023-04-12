@@ -11,6 +11,12 @@ sort:	nop
 	pushq %rbp
 	movq %rsp, %rbp
 	subq $16, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movq %rbp, %rbx
 	subq $4, %rbx
 	leaq _gp(%rip), %rcx
@@ -168,6 +174,12 @@ j3: nop
 j1: nop
 	movl $1, %r12d
 	movl %r12d, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -176,7 +188,12 @@ j1: nop
 output:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	leaq _gp(%rip), %rbx
 	addq $96, %rbx
 	movl $1, %ecx
@@ -204,7 +221,11 @@ j6: nop
 	leaq .string_const0(%rip), %rdi
 	movl %ecx, %esi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call printf@PLT
+	addq $8, %rsp
+	pop %rbx
 	leaq _gp(%rip), %rcx
 	addq $96, %rcx
 	leaq _gp(%rip), %r8
@@ -217,6 +238,12 @@ j6: nop
 j7: nop
 	movl $1, %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -225,7 +252,12 @@ j7: nop
 input:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	leaq _gp(%rip), %rbx
 	addq $88, %rbx
 	movl $3, %ecx
@@ -268,7 +300,11 @@ j8: nop
 	leaq .string_const3(%rip), %rdi
 	movq %r8, %rsi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call scanf@PLT
+	addq $8, %rsp
+	pop %rbx
 	leaq _gp(%rip), %rcx
 	addq $96, %rcx
 	leaq _gp(%rip), %r8
@@ -281,6 +317,12 @@ j8: nop
 j9: nop
 	movl $1, %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -289,7 +331,12 @@ j9: nop
 initialize:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	leaq _gp(%rip), %rbx
 	addq $96, %rbx
 	movl $1, %ecx
@@ -327,6 +374,12 @@ j10: nop
 j11: nop
 	movl $1, %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -337,44 +390,32 @@ main:	nop
 	movq %rsp, %rbp
 	leaq _gp(%rip), %rbx
 	addq $84, %rbx
-	push %rbx
 	call initialize
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leaq _gp(%rip), %rbx
 	addq $84, %rbx
-	push %rbx
 	call output
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leaq _gp(%rip), %rbx
 	addq $84, %rbx
-	push %rbx
 	call input
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leaq _gp(%rip), %rbx
 	addq $84, %rbx
-	push %rbx
 	call output
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leaq _gp(%rip), %rbx
 	addq $84, %rbx
-	push %rbx
 	call sort
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leaq _gp(%rip), %rbx
 	addq $84, %rbx
-	push %rbx
 	call output
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leave

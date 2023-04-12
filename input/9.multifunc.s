@@ -6,7 +6,12 @@
 b1:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movl $1, %ebx
 	leaq .string_const0(%rip), %rdi
 	movl %ebx, %esi
@@ -14,6 +19,12 @@ b1:	nop
 	call printf@PLT
 	movl $1, %ebx
 	movl %ebx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -22,7 +33,12 @@ b1:	nop
 b2:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movl $2, %ebx
 	leaq .string_const0(%rip), %rdi
 	movl %ebx, %esi
@@ -31,6 +47,12 @@ b2:	nop
 	call b1
 	movl %eax, %ebx
 	movl %ebx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -39,7 +61,12 @@ b2:	nop
 b3:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movl $3, %ebx
 	leaq .string_const0(%rip), %rdi
 	movl %ebx, %esi
@@ -47,12 +74,16 @@ b3:	nop
 	call printf@PLT
 	call b1
 	movl %eax, %ebx
-	push %rbx
 	call b2
-	pop %rbx
 	movl %eax, %ecx
 	addl %ecx, %ebx
 	movl %ebx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -61,7 +92,12 @@ b3:	nop
 b4:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	movl $4, %ebx
 	leaq .string_const0(%rip), %rdi
 	movl %ebx, %esi
@@ -69,17 +105,19 @@ b4:	nop
 	call printf@PLT
 	call b1
 	movl %eax, %ebx
-	push %rbx
 	call b2
-	pop %rbx
 	movl %eax, %ecx
 	addl %ecx, %ebx
-	push %rbx
 	call b3
-	pop %rbx
 	movl %eax, %ecx
 	addl %ecx, %ebx
 	movl %ebx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -90,19 +128,13 @@ main:	nop
 	movq %rsp, %rbp
 	call b1
 	movl %eax, %ebx
-	push %rbx
 	call b2
-	pop %rbx
 	movl %eax, %ecx
 	addl %ecx, %ebx
-	push %rbx
 	call b3
-	pop %rbx
 	movl %eax, %ecx
 	addl %ecx, %ebx
-	push %rbx
 	call b4
-	pop %rbx
 	movl %eax, %ecx
 	addl %ecx, %ebx
 	leaq .string_const0(%rip), %rdi

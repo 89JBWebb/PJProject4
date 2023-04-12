@@ -12,7 +12,13 @@
 gcd:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $4, %rsp
+	subq $16, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+	subq $8, %rsp
 	leaq _gp(%rip), %rbx
 	addq $8, %rbx
 	movl (%rbx), %ecx
@@ -21,18 +27,23 @@ gcd:	nop
 	movl $0, %ecx
 	movl $1, %ebx
 	cmove %ebx, %ecx
-	movl $-1, %ebx
-	testl %ecx, %ebx
-	je .L0
+	cmpl $1, %ecx
+	jne j0
 	leaq _gp(%rip), %rbx
 	addq $4, %rbx
 	movl (%rbx), %ecx
 	movl %ecx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
-	jmp .L1
-.L0:	 nop
+	jmp j1
+j0: nop
 	movq %rbp, %rbx
 	subq $4, %rbx
 	leaq _gp(%rip), %rcx
@@ -69,10 +80,16 @@ gcd:	nop
 	call gcd
 	movl %eax, %ebx
 	movl %ebx, %eax
+	addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
-.L1:	 nop
+j1: nop
 	.globl main
 	.type main,@function
 main:	nop
@@ -87,7 +104,11 @@ main:	nop
 	leaq .string_const2(%rip), %rdi
 	movq %rbx, %rsi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call scanf@PLT
+	addq $8, %rsp
+	pop %rbx
 	movl $0, %eax
 	leaq .string_const0(%rip), %rdi
 	leaq .string_const3(%rip), %rsi
@@ -97,8 +118,12 @@ main:	nop
 	leaq .string_const2(%rip), %rdi
 	movq %rbx, %rsi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call scanf@PLT
-.L2:	nop
+	addq $8, %rsp
+	pop %rbx
+j2: nop
 	leaq _gp(%rip), %rbx
 	addq $4, %rbx
 	movl (%rbx), %ecx
@@ -116,9 +141,8 @@ main:	nop
 	movl $1, %ebx
 	cmovne %ebx, %r8d
 	orl %r8d, %ecx
-	movl $-1, %ebx
-	testl %ecx, %ebx
-	je .L3
+	cmpl $1, %ecx
+	jne j3
 	movl $0, %eax
 	leaq .string_const0(%rip), %rdi
 	leaq .string_const4(%rip), %rsi
@@ -138,7 +162,11 @@ main:	nop
 	leaq .string_const2(%rip), %rdi
 	movq %rbx, %rsi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call scanf@PLT
+	addq $8, %rsp
+	pop %rbx
 	movl $0, %eax
 	leaq .string_const0(%rip), %rdi
 	leaq .string_const3(%rip), %rsi
@@ -148,8 +176,12 @@ main:	nop
 	leaq .string_const2(%rip), %rdi
 	movq %rbx, %rsi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call scanf@PLT
-	jmp .L2
-.L3:	 nop
+	addq $8, %rsp
+	pop %rbx
+	jmp j2
+j3: nop
 	leave
 	ret
