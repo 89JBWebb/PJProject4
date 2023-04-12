@@ -17,6 +17,7 @@ extern SymtabStack localSymStack;
 extern int globalOffset;
 extern int localOffset;
 extern int dataSize;
+extern int isGlobal;
 
 static void printDataDeclaration(DNode decl);
 static void printInstruction(DNode inst);
@@ -814,10 +815,8 @@ void addIdToSymtab(DNode node, Generic gtypeid) {
 	int offset;
 	int typeid = (int)gtypeid;
 	int typeSize = getTypeSize(typeid);
-		
-        SymPutFieldByIndex(globalSymtab, symIndex, SYMTAB_OFFSET_FIELD, (Generic)(globalOffset));
-        SymPutFieldByIndex(globalSymtab, symIndex, SYMTAB_TYPE_INDEX_FIELD, (Generic)typeid);
-
+	SymPutFieldByIndex(globalSymtab, symIndex, SYMTAB_OFFSET_FIELD, (Generic)(globalOffset));
+	SymPutFieldByIndex(globalSymtab, symIndex, SYMTAB_TYPE_INDEX_FIELD, (Generic)typeid);
 	globalOffset += typeSize;
 }
 
@@ -836,12 +835,20 @@ void addIdToSymStack(DNode node, Generic gtypeid) {
 	int typeSize = getTypeSize(typeid);
 
 	offset = (int) SymGetField( currentSymtab(localSymStack), " ", "offset");
-	offset+= typeSize;
-	SymPutField( currentSymtab(localSymStack), " ", "offset", (Generic) offset);
+
+	if(!isGlobal){
+		offset+= typeSize;
+		SymPutField( currentSymtab(localSymStack), " ", "offset", (Generic) offset);
+	}
 
 	SymPutField( currentSymtab(localSymStack), id, "offset", (Generic)(offset));
     SymPutField( currentSymtab(localSymStack), id, "type", (Generic)typeid);
 	
+	if(isGlobal){
+		offset+= typeSize;
+		SymPutField( currentSymtab(localSymStack), " ", "offset", (Generic) offset);
+	}
+
 }
 
 /**

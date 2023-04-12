@@ -140,7 +140,9 @@ ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 		{
 			$$ = "main";
 			globalSymtab = endScope(localSymStack);
+			
 			globalOffset = (int)SymGetField(globalSymtab, " ", "offset");
+			isGlobal = 0;
 		};
 
 Decls : T_VAR DeclList
