@@ -34,6 +34,7 @@ EXTERN(void, emitEndBranchTarget, (DList instList, int endLabelIndex));
 EXTERN(int, emitThenBranch, (DList instList, int elseLabelIndex));
 EXTERN(int, emitWhileLoopLandingPad, (DList instList));
 EXTERN(int, emitWhileLoopTest, (DList instList, int regIndex));
+EXTERN(void, emitCallNoReturn, (DList instList, char *function_name));
 EXTERN(int, emitCall, (DList instList, char *function_name));
 EXTERN(void, emitWhileLoopBackBranch,(DList instList, int beginLabelIndex, int endLabelIndex));
 

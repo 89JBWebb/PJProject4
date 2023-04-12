@@ -68,11 +68,11 @@ j1: nop
 	movl (%r10), %r8d
 	movl %r8d, %eax
 addq $8, %rsp
-	popq %r15
-	popq %r14
-	popq %r13
-	popq %r12
-	popq %rbx
+	popq %r11
+	popq %r10
+	popq %r9
+	popq %r8
+	popq %rcx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -120,11 +120,11 @@ j2: nop
 j3: nop
 	leaq _gp(%rip), %rcx
 	addq $4, %rcx
-	push %rbx
+	push %rcx
 	subq $8, %rsp
 	call t
 	addq $8, %rsp
-	pop %rbx
+	pop %rcx
 	movl %eax, %r8d
 	movl %r8d, (%rcx)
 	leaq _gp(%rip), %rcx
@@ -133,6 +133,10 @@ j3: nop
 	leaq .string_const0(%rip), %rdi
 	movl %r8d, %esi
 	movl $0, %eax
+	push %rbx
+	subq $8, %rsp
 	call printf@PLT
+	addq $8, %rsp
+	pop %rbx
 	leave
 	ret

@@ -182,8 +182,7 @@ void emitReadVariable(DList instList, DList dataList, int addrIndex) {
 	inst = ssave("\tmovl $0, %eax");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	inst = ssave("\tcall scanf@PLT");
-	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	emitCallNoReturn(instList, "printf@PLT");
 
 	freeIntegerRegister(addrIndex);
 }
@@ -227,8 +226,7 @@ void emitWriteExpression(DList instList, DList dataList, int writeType, int regI
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	freeIntegerRegister(regIndex);
 	  
-	inst = ssave("\tcall printf@PLT");
-	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	emitCallNoReturn(instList, "printf@PLT");
 }
 
 /**
@@ -273,8 +271,7 @@ void emitWriteString(DList instList,  DList dataList, int writeType, char *str, 
 
 	free(strLabel);
 
-	inst = ssave("\tcall printf@PLT");
-	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	emitCallNoReturn(instList, "printf@PLT");
 }
 
 /**
@@ -860,7 +857,7 @@ void emitProcedureExitWithReturn(DList instList, int regIndex) {
 	inst = ssave("addq $8, %rsp");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	int *toSave = getCalleeSavedRegisters();
+	int *toSave = getCallerSavedRegisters();
 	for(int i = 4; i >= 0; i--){
 		inst = nssave(2,"\tpopq ", get64bitIntegerRegisterName(toSave[i]));
   		dlinkAppend(instList,dlinkNodeAlloc(inst));
@@ -1028,7 +1025,7 @@ void emitWhileLoopBackBranch(DList instList, int beginLabelIndex, int endLabelIn
 int emitCall(DList instList, char *function_name){
 
 	char *inst;
-	int *toSave = getCalleeSavedRegisters();
+	int *toSave = getCallerSavedRegisters();
 	int savedRegs = 0;
 
 	for(int i = 0; i < 5; i++){
@@ -1067,7 +1064,7 @@ int emitCall(DList instList, char *function_name){
 
 }
 
-int emitCallNoReturn(DList instList, char *function_name){
+void emitCallNoReturn(DList instList, char *function_name){
 
 	char *inst;
 	int *toSave = getCalleeSavedRegisters();
