@@ -7,30 +7,42 @@
 t:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $4, %rsp
-	leaq _gp(%rip), %rcx
-	addq $8, %rcx
-	movl $5, %r8d
-	movl %r8d, (%rcx)
-	movq %rbp, %rcx
-	subq $4, %rcx
-	movl $2, %r8d
-	movl %r8d, (%rcx)
-	movq %rbp, %rcx
-	subq $4, %rcx
-	movl (%rcx), %r8d
+	subq $16, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+subq $8, %rsp
+	leaq _gp(%rip), %rbx
+	addq $8, %rbx
+	movl $5, %ecx
+	movl %ecx, (%rbx)
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl $2, %ecx
+	movl %ecx, (%rbx)
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl (%rbx), %ecx
 	leaq .string_const0(%rip), %rdi
-	movl %r8d, %esi
+	movl %ecx, %esi
 	movl $0, %eax
 	call printf@PLT
-	movq %rbp, %rcx
-	subq $4, %rcx
-	movl (%rcx), %r8d
-	leaq _gp(%rip), %r9
-	addq $8, %r9
-	movl (%r9), %r10d
-	addl %r10d, %r8d
-	movl %r8d, %eax
+	movq %rbp, %rbx
+	subq $4, %rbx
+	movl (%rbx), %ecx
+	leaq _gp(%rip), %rbx
+	addq $8, %rbx
+	movl (%rbx), %r8d
+	addl %r8d, %ecx
+	movl %ecx, %eax
+addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -39,30 +51,28 @@ t:	nop
 main:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	leaq _gp(%rip), %rcx
-	addq $4, %rcx
-	movl $1, %r8d
-	movl %r8d, (%rcx)
-	leaq _gp(%rip), %r8
-	addq $8, %r8
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
+	movl $1, %ecx
+	movl %ecx, (%rbx)
+	leaq _gp(%rip), %rbx
+	addq $8, %rbx
 	push %rbx
-	push %rcx
-	push %r8
+	subq $8, %rsp
 	call t
-	pop %r8
-	pop %rcx
+	addq $8, %rsp
 	pop %rbx
-	movl %eax, %r9d
-	movl %r9d, (%r8)
-	leaq _gp(%rip), %r9
-	addq $4, %r9
-	movl (%r9), %r10d
-	leaq _gp(%rip), %r11
-	addq $8, %r11
-	movl (%r11), %r12d
-	addl %r12d, %r10d
+	movl %eax, %ecx
+	movl %ecx, (%rbx)
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
+	movl (%rbx), %ecx
+	leaq _gp(%rip), %rbx
+	addq $8, %rbx
+	movl (%rbx), %r8d
+	addl %r8d, %ecx
 	leaq .string_const0(%rip), %rdi
-	movl %r10d, %esi
+	movl %ecx, %esi
 	movl $0, %eax
 	call printf@PLT
 	leave

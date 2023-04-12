@@ -21,6 +21,8 @@
 #define ESI  12
 #define EDI  13
 
+EXTERN(int *, getCalleeSavedRegisters, (void));
+EXTERN(int *, getCallerSavedRegisters, (void));
 EXTERN(void, initRegisters, (void));
 EXTERN(void, cleanupRegisters, (void));
 EXTERN(int, allocateIntegerRegister, (void));

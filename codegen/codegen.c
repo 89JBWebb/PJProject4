@@ -33,7 +33,6 @@ static void makeLabel(char label[20]);
  */
 static void printDataDeclaration(DNode decl) {
 	printf("\t%s\n",(char*)dlinkNodeAtom(decl));
-
 }
 
 /**
@@ -52,14 +51,35 @@ void emitProcedurePrologue(DList instList, char* name) {
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	inst = ssave("\tmovq %rsp, %rbp");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	//free all registers
+
 }
 
 void raiseStack(DList instList){
 	char offsetStr[10];
 	int offset = (int) SymGetField( currentSymtab( localSymStack ), " ", "offset" );
-	snprintf(offsetStr,9,"%d",offset);
-	char *inst = nssave(3,"\tsubq $", offsetStr, ", %rsp");
-  	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	char *inst;
+
+	if(offset%16 != 0){
+		offset+= 16-(offset%16);
+	}
+
+	if(offset != 0){
+		snprintf(offsetStr,9,"%d",offset);
+		inst = nssave(3,"\tsubq $", offsetStr, ", %rsp");
+  		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+
+	int *toSave = getCalleeSavedRegisters();
+	for(int i = 0; i < 5; i++){
+		inst = nssave(2,"\tpushq ", get64bitIntegerRegisterName(toSave[i]));
+  		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+
+	inst = ssave("\tsubq $8, %rsp");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
 }
 
 
@@ -836,6 +856,17 @@ void addIdToSymStack(DNode node, Generic gtypeid) {
 void emitProcedureExitWithReturn(DList instList, int regIndex) {
 	char *inst = nssave(3, "\tmovl ", getIntegerRegisterName(regIndex), ", %eax");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	inst = ssave("addq $8, %rsp");
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	int *toSave = getCalleeSavedRegisters();
+	for(int i = 4; i >= 0; i--){
+		inst = nssave(2,"\tpopq ", get64bitIntegerRegisterName(toSave[i]));
+  		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+
+
 	inst = ssave("\tmovq %rbp, %rsp");
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 	inst = ssave("\tpopq %rbp");
@@ -997,20 +1028,33 @@ void emitWhileLoopBackBranch(DList instList, int beginLabelIndex, int endLabelIn
 int emitCall(DList instList, char *function_name){
 
 	char *inst;
+	int *toSave = getCalleeSavedRegisters();
+	int savedRegs = 0;
 
-	for(int i = 0; i < 10; i++){
-		if(isAllocatedIntegerRegister(i)){
-			inst = nssave(2, "\tpush ", get64bitIntegerRegisterName(i));
+	for(int i = 0; i < 5; i++){
+		if(isAllocatedIntegerRegister(toSave[i])){
+			inst = nssave(2, "\tpush ", get64bitIntegerRegisterName(toSave[i]));
 			dlinkAppend(instList,dlinkNodeAlloc(inst));
+			savedRegs++;
 		}
+	}
+
+	if(savedRegs%2){
+		inst = ssave("\tsubq $8, %rsp");
+		dlinkAppend(instList,dlinkNodeAlloc(inst));
 	}
 
 	inst = nssave(2, "\tcall ", function_name);
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-	for(int i = 9; i >= 0; i--){
-		if(isAllocatedIntegerRegister(i)){
-			inst = nssave(2, "\tpop ", get64bitIntegerRegisterName(i));
+	if(savedRegs%2){
+		inst = ssave("\taddq $8, %rsp");
+		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+
+	for(int i = 4; i >= 0; i--){
+		if(isAllocatedIntegerRegister(toSave[i])){
+			inst = nssave(2, "\tpop ", get64bitIntegerRegisterName(toSave[i]));
 			dlinkAppend(instList,dlinkNodeAlloc(inst));
 		}
 	}
@@ -1020,5 +1064,41 @@ int emitCall(DList instList, char *function_name){
 	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
 	return treg;
+
+}
+
+int emitCallNoReturn(DList instList, char *function_name){
+
+	char *inst;
+	int *toSave = getCalleeSavedRegisters();
+	int savedRegs = 0;
+
+	for(int i = 0; i < 5; i++){
+		if(isAllocatedIntegerRegister(toSave[i])){
+			inst = nssave(2, "\tpush ", get64bitIntegerRegisterName(toSave[i]));
+			dlinkAppend(instList,dlinkNodeAlloc(inst));
+			savedRegs++;
+		}
+	}
+
+	if(savedRegs%2){
+		inst = ssave("\tsubq $8, %rsp");
+		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+
+	inst = nssave(2, "\tcall ", function_name);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	if(savedRegs%2){
+		inst = ssave("\taddq $8, %rsp");
+		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	}
+
+	for(int i = 4; i >= 0; i--){
+		if(isAllocatedIntegerRegister(toSave[i])){
+			inst = nssave(2, "\tpop ", get64bitIntegerRegisterName(toSave[i]));
+			dlinkAppend(instList,dlinkNodeAlloc(inst));
+		}
+	}
 
 }

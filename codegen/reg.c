@@ -25,6 +25,14 @@ static bool *allocatedIntegerRegisters; /**< vector of bools indicated whether r
 int calleeSavedRegisters[NUM_CALLEE_SAVED] = {EBX, R12D, R13D, R14D, R15D};
 int callerSavedRegisters[NUM_CALLER_SAVED] = {ECX, R8D, R9D, R10D, R11D};
 
+int * getCalleeSavedRegisters(){
+	return calleeSavedRegisters;
+}
+
+int * getCallerSavedRegisters(){
+	return callerSavedRegisters;
+}
+
 /**
  * Initialize the allocated registers vector
  */

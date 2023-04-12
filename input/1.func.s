@@ -9,13 +9,24 @@
 t:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $0, %rsp
+	pushq %rbx
+	pushq %r12
+	pushq %r13
+	pushq %r14
+	pushq %r15
+subq $8, %rsp
 	movl $0, %eax
 	leaq .string_const0(%rip), %rdi
 	leaq .string_const1(%rip), %rsi
 	call printf@PLT
 	movl $10, %ebx
 	movl %ebx, %eax
+addq $8, %rsp
+	popq %r15
+	popq %r14
+	popq %r13
+	popq %r12
+	popq %rbx
 	movq %rbp, %rsp
 	popq %rbp
 	ret
@@ -24,20 +35,20 @@ t:	nop
 main:	nop
 	pushq %rbp
 	movq %rsp, %rbp
-	leaq _gp(%rip), %rcx
-	addq $4, %rcx
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
 	push %rbx
-	push %rcx
+	subq $8, %rsp
 	call t
-	pop %rcx
+	addq $8, %rsp
 	pop %rbx
-	movl %eax, %r8d
-	movl %r8d, (%rcx)
-	leaq _gp(%rip), %r8
-	addq $4, %r8
-	movl (%r8), %r9d
+	movl %eax, %ecx
+	movl %ecx, (%rbx)
+	leaq _gp(%rip), %rbx
+	addq $4, %rbx
+	movl (%rbx), %ecx
 	leaq .string_const2(%rip), %rdi
-	movl %r9d, %esi
+	movl %ecx, %esi
 	movl $0, %eax
 	call printf@PLT
 	leave
