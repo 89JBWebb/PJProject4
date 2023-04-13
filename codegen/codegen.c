@@ -575,78 +575,60 @@ int emitComputeLocalAddress(DList instList, char *name) {
  * @return the symbol table index of the register holding the address of the
  * 		   array element.
  */
-int emitCompute2DArrayAddress(DList instList, int varIndex, int subIndex1, int subIndex2) {
-	int regIndex = allocateIntegerRegister();
-	int varTypeIndex = (int)SymGetFieldByIndex(globalSymtab,varIndex,SYMTAB_TYPE_INDEX_FIELD);
-	
-	  if (isArrayType(varTypeIndex)) {
-		char* regName = get64bitIntegerRegisterName(regIndex);
-		int offset = (int)SymGetFieldByIndex(globalSymtab,varIndex,SYMTAB_OFFSET_FIELD);
-		char offsetStr[10];
-	
-		snprintf(offsetStr,9,"%d",offset);
-	
-		char *inst = nssave(2,"\tleaq _gp(%rip), ", regName);
+int emitCompute2DArrayAddress(DList instList, char *name, int subIndex1, int subIndex2) {
+	int varTypeIndex = (int)SymGetField(globalSymtab,name,"type");
 
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-		inst = nssave(4,"\taddq $", offsetStr, ", ", regName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	int r =  emitComputeLocalAddress(instList, name);
+	char *regName = get64bitIntegerRegisterName(r);
 
-		/* compute offset based on subscript */		        
-		int tReg = allocateIntegerRegister();
-		char* sub1Reg32Name = getIntegerRegisterName(subIndex1);
-		char* sub1RegName = get64bitIntegerRegisterName(subIndex1);
-		char* tname = get64bitIntegerRegisterName(tReg);
-          
-		inst = nssave(4,"\tmovslq ", sub1Reg32Name, ", ", sub1RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-
-		int base1 = get1stDimensionbase(varTypeIndex);
-		snprintf(offsetStr,9,"%d",base1);
-		inst = nssave(4, "\tsubq $", offsetStr, ", ", sub1RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-
-		int dim = get2ndDimensionSize(varTypeIndex);
-		snprintf(offsetStr,9,"%d",dim);
-		inst = nssave(4, "\tmovq $", offsetStr, ", ", tname);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-
-		inst = nssave(4, "\timulq ", tname, ", ", sub1RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-		freeIntegerRegister(tReg);
-
-		char* sub2Reg32Name = getIntegerRegisterName(subIndex2);
-		char* sub2RegName = get64bitIntegerRegisterName(subIndex2);
+	/* compute offset based on subscript */		        
+	int tReg = allocateIntegerRegister();
+	char* sub1Reg32Name = getIntegerRegisterName(subIndex1);
+	char* sub1RegName = get64bitIntegerRegisterName(subIndex1);
+	char* tname = get64bitIntegerRegisterName(tReg);
 		
-		inst = nssave(4,"\tmovslq ", sub2Reg32Name, ", ", sub2RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-		inst = nssave(4, "\taddq ", sub2RegName, ", ", sub1RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
-		
-		int base2 = get2ndDimensionbase(varTypeIndex);
-		snprintf(offsetStr,9,"%d",base2);
-		inst = nssave(4, "\tsubq $", offsetStr, ", ", sub1RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	char *inst = nssave(4,"\tmovslq ", sub1Reg32Name, ", ", sub1RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-		// to do: use element size below
-		inst = nssave(2,"\timulq $4, ", sub1RegName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));
+	char offsetStr[10];
+	int base1 = get1stDimensionbase(varTypeIndex);
+	snprintf(offsetStr,9,"%d",base1);
+	inst = nssave(4, "\tsubq $", offsetStr, ", ", sub1RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-		/* compute element address */
-		inst = nssave(4,"\taddq ", sub1RegName, ", ", regName);
-		dlinkAppend(instList,dlinkNodeAlloc(inst));	 
-	  }
-	else {
-		char msg[80];
+	int dim = get2ndDimensionSize(varTypeIndex);
+	snprintf(offsetStr,9,"%d",dim);
+	inst = nssave(4, "\tmovq $", offsetStr, ", ", tname);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
 
-		snprintf(msg,80,"Scalar variable %s used as an array",
-			 (char*)SymGetFieldByIndex(globalSymtab,varIndex,SYM_NAME_FIELD));
-		yyerror(msg);
-	}
+	inst = nssave(4, "\timulq ", tname, ", ", sub1RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	freeIntegerRegister(tReg);
+
+	char* sub2Reg32Name = getIntegerRegisterName(subIndex2);
+	char* sub2RegName = get64bitIntegerRegisterName(subIndex2);
+	
+	inst = nssave(4,"\tmovslq ", sub2Reg32Name, ", ", sub2RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	inst = nssave(4, "\taddq ", sub2RegName, ", ", sub1RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+	
+	int base2 = get2ndDimensionbase(varTypeIndex);
+	snprintf(offsetStr,9,"%d",base2);
+	inst = nssave(4, "\tsubq $", offsetStr, ", ", sub1RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	// to do: use element size below
+	inst = nssave(2,"\timulq $4, ", sub1RegName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));
+
+	/* compute element address */
+	inst = nssave(4,"\taddq ", sub1RegName, ", ", regName);
+	dlinkAppend(instList,dlinkNodeAlloc(inst));	 
 	
 	freeIntegerRegister(subIndex1);
 	freeIntegerRegister(subIndex2);
-	return regIndex;
+	return r;
 
 }
 

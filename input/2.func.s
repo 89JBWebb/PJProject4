@@ -15,7 +15,7 @@ t:	nop
 	pushq %r13
 	pushq %r14
 	pushq %r15
-subq $8, %rsp
+	subq $8, %rsp
 	movl $0, %eax
 	leaq .string_const0(%rip), %rdi
 	leaq .string_const1(%rip), %rsi
@@ -30,7 +30,7 @@ subq $8, %rsp
 	movl $5, %ebx
 	addl %ebx, %ecx
 	movl %ecx, %eax
-addq $8, %rsp
+	addq $8, %rsp
 	popq %r15
 	popq %r14
 	popq %r13
@@ -45,16 +45,12 @@ main:	nop
 	pushq %rbp
 	movq %rsp, %rbp
 	leaq _gp(%rip), %rbx
-	addq $4, %rbx
-	push %rbx
-	subq $8, %rsp
+	addq $0, %rbx
 	call t
-	addq $8, %rsp
-	pop %rbx
 	movl %eax, %ecx
 	movl %ecx, (%rbx)
 	leaq _gp(%rip), %rbx
-	addq $4, %rbx
+	addq $0, %rbx
 	movl (%rbx), %ecx
 	leaq .string_const2(%rip), %rdi
 	movl %ecx, %esi

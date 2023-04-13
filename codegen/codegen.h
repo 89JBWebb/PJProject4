@@ -42,7 +42,7 @@ EXTERN(int, emitComputeVariableAddress,(DList instList, int varIndex));
 EXTERN(int, emitComputeLocalAddress,(DList instList, char *name));
 EXTERN(int, emitComputeLocalArrayAddress, (DList instList, char *name, int subIndex));
 EXTERN(int, emitComputeGlobalArrayAddress, (DList instList, char *name, int subIndex));
-EXTERN(int, emitCompute2DArrayAddress, (DList instList, int varIndex, int subIndex1, int subIndex2));
+EXTERN(int, emitCompute2DArrayAddress, (DList instList, char *name, int subIndex1, int subIndex2));
 
 EXTERN(int, emitLoadVariable,(DList instList, int varIndex));
 EXTERN(int, emitLoadIntegerConstant,(DList instList, char* intConst));

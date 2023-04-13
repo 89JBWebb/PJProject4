@@ -140,7 +140,7 @@ ProgramHead : T_PROGRAM T_IDENTIFIER T_SEMICOLON Decls
 		{
 			$$ = "main";
 			globalSymtab = endScope(localSymStack);
-			
+
 			globalOffset = (int)SymGetField(globalSymtab, " ", "offset");
 			isGlobal = 0;
 		};
@@ -496,7 +496,7 @@ Variable        : T_IDENTIFIER
 		{
 			/*int symIndex = SymQueryIndex(globalSymtab,$1);
 			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);*/
-
+			$$ = emitCompute2DArrayAddress(instList, $1, $3, $5);
 			//$$ = emitComputeLocalMatrixAddress(instList, $1, $3);
 
 		};

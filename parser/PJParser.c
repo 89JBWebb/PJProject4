@@ -1435,7 +1435,7 @@ yyreduce:
     {
 			(yyval.name) = "main";
 			globalSymtab = endScope(localSymStack);
-			
+
 			globalOffset = (int)SymGetField(globalSymtab, " ", "offset");
 			isGlobal = 0;
 		}
@@ -1975,7 +1975,7 @@ yyreduce:
     {
 			/*int symIndex = SymQueryIndex(globalSymtab,$1);
 			$$ = emitCompute2DArrayAddress(instList, symIndex,$3, $5);*/
-
+			(yyval.regIndex) = emitCompute2DArrayAddress(instList, (yyvsp[-5].name), (yyvsp[-3].regIndex), (yyvsp[-1].regIndex));
 			//$$ = emitComputeLocalMatrixAddress(instList, $1, $3);
 
 		}
